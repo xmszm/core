@@ -1,0 +1,40 @@
+.core-dialog-main,
+.core-dialog-content {
+  box-sizing: border-box;
+
+  // max-height: 600px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.core-dialog-main {
+  min-height: 300px;
+}
+.core-dialog-content {
+  // border-top: 1px solid #91919147;
+}
+
+.core-dialog {
+  .n-dialog__content {
+    overflow-y: auto;
+    margin: 10px -28px 0;
+    box-sizing: border-box;
+    flex: 1;
+    border-top: 1px solid #91919147;
+    border-bottom: 1px solid #91919147;
+    padding: 28px;
+    // max-height: 500px;
+  }
+
+  .n-dialog__action {
+    padding: 20px 0 0 0;
+    box-sizing: border-box;
+  }
+}
+
+
+.core-dialog-read{
+  .n-dialog__content {
+    border-bottom: unset;
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "name": "@xmszm/core",
+  "version": "0.1.0",
+  "description": "Nex core 组件与工具库",
+  "license": "UNLICENSED",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./types/index.d.ts",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:xmszm/core.git"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./types/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "types",
+    "docs",
+    "examples"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "clean": "rimraf dist",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "peerDependencies": {
+    "@vicons/ionicons5": "^0.13.0",
+    "dayjs": "^1.11.0",
+    "lodash-es": "^4.17.21",
+    "naive-ui": "^2.38.0",
+    "vue": "^3.3.0",
+    "vue-router": "^4.2.0"
+  },
+  "devDependencies": {
+    "@vicons/ionicons5": "^0.13.0",
+    "@vitejs/plugin-vue": "^5.1.2",
+    "@vitejs/plugin-vue-jsx": "^4.0.1",
+    "dayjs": "^1.11.0",
+    "less": "^4.2.0",
+    "lodash-es": "^4.17.21",
+    "naive-ui": "^2.38.0",
+    "rimraf": "^6.0.1",
+    "vite": "^5.4.0",
+    "vitepress": "^1.2.3",
+    "vue": "^3.3.0",
+    "vue-router": "^4.2.0"
+  }
+}
+
