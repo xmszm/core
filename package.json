@@ -1,7 +1,7 @@
 {
   "name": "@xmszm/core",
-  "version": "0.1.1",
-  "description": "Nex core 组件与工具库",
+  "version": "0.0.1",
+  "description": "naiveui core 组件与工具库",
   "license": "UNLICENSED",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
