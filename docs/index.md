@@ -1,8 +1,8 @@
 ---
 layout: home
-title: Nex Core
+title: '@xmszm/core'
 hero:
-  name: Nex Core
+  name: '@xmszm/core'
   text: Vue 3 + Naive UI 的表单、表格、弹窗与工具集合
   tagline: 开箱即用的配置式表单与表格方案，内置弹窗、上传、权限、路由工具。
   actions:

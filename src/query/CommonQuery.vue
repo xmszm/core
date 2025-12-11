@@ -3,7 +3,14 @@ import { RefreshOutline, SearchOutline } from '@vicons/ionicons5'
 import { DataForm } from 'core'
 import { getOptions } from 'core/options/defaultOptions.jsx'
 import { ObjectToArray } from 'core/utils/object.js'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, getCurrentInstance } from 'vue'
+import { registerDirectives } from '../directives/auto-register'
+
+// 自动注册指令
+const instance = getCurrentInstance()
+if (instance?.appContext?.app) {
+  registerDirectives(instance.appContext.app)
+}
 
 // 防抖函数
 function debounce(func, delay) {

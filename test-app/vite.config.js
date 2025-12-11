@@ -1,0 +1,42 @@
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+import path from 'path'
+
+// 插件：重定向 @xmszm/core 中的 @/ 路径到项目 src
+const redirectExternalImports = () => {
+  return {
+    name: 'redirect-external-imports',
+    resolveId(id, importer) {
+      // 如果是从 @xmszm/core 导入的 @/ 路径，重定向到项目 src
+      if (importer && importer.includes('@xmszm/core') && id.startsWith('@/')) {
+        const resolvedPath = path.resolve(__dirname, 'src', id.replace('@/', ''))
+        return resolvedPath
+      }
+      return null
+    },
+  }
+}
+
+export default defineConfig({
+  plugins: [vue(), vueJsx(), redirectExternalImports()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+      // 解决 npm/pnpm link 时模块和样式文件路径解析问题
+      // 直接指向源项目根目录，Vite 会通过 package.json 的 exports 正确解析
+      '@xmszm/core': path.resolve(__dirname, '..'),
+      '@xmszm/core/dist/style.css': path.resolve(__dirname, '../dist/style.css'),
+    },
+    dedupe: ['vue'],
+  },
+  optimizeDeps: {
+    include: ['@xmszm/core'],
+    exclude: ['@xmszm/core'],
+  },
+  server: {
+    port: 3000,
+    open: true
+  }
+})
+

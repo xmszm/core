@@ -8,7 +8,7 @@ title: Options（动态项渲染）
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Options } from 'core'
+import { Options } from '@xmszm/core'
 
 const model = ref({})
 const formRef = ref()

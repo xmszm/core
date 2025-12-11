@@ -5,10 +5,17 @@ import { ellipsis } from 'core/table/utils/ellipsis'
 import dayjs from 'dayjs'
 import { uniqueId } from 'lodash-es'
 import { NButton, NTooltip } from 'naive-ui'
-import { computed, onMounted, ref, unref, watch ,isProxy} from 'vue'
+import { computed, onMounted, ref, unref, watch ,isProxy, getCurrentInstance} from 'vue'
 import { useRoute } from 'vue-router'
 import FilterDialog from './FilterDialog.vue'
 import { orderEnum } from 'core'
+import { registerDirectives } from '../directives/auto-register'
+
+// 自动注册指令
+const instance = getCurrentInstance()
+if (instance?.appContext?.app) {
+  registerDirectives(instance.appContext.app)
+}
 
 const props = defineProps({
   data: {
@@ -71,6 +78,16 @@ const props = defineProps({
 const route = useRoute()
 const FilterKey = 'filter_key'
 const emit = defineEmits(['sorted'])
+
+// 安全获取路由路径，如果没有路由上下文则使用默认值
+const getRoutePath = () => {
+  try {
+    return route?.fullPath || route?.path || ''
+  } catch {
+    return ''
+  }
+}
+
 const _data = computed(() => {
   console.log('table -data', props.data)
 
@@ -125,8 +142,9 @@ watch(
 
 function init() {
   const columns = unref(props.columns)
+  const routePath = getRoutePath()
   headDefault.value
-    = getFilterAll.value?.[route.fullPath]
+    = (routePath && getFilterAll.value?.[routePath])
       || columns?.map((v, i) => v?.key || dayjs().valueOf() + i)
 
   const arr = props.isFilter
@@ -223,8 +241,11 @@ function filterHandle() {
               selectItem={headDefault.value}
               defaultItem={props.defaultColumns}
               onSubmit={(v) => {
-                getFilterAll.value[route.fullPath] = v
+                const routePath = getRoutePath()
+                if (routePath) {
+                  getFilterAll.value[routePath] = v
                 setHeadFilter(getFilterAll.value)
+                }
                 init()
                 cancel()
               }}

@@ -2,18 +2,29 @@
 
 ## 安装
 ```bash
-npm install core
+npm install @xmszm/core
+# 或
+pnpm add @xmszm/core
+# 或
+yarn add @xmszm/core
 ```
 
-需要同时安装的 peer 依赖（版本可按项目统一）：`vue`、`naive-ui`、`vue-router`、`dayjs`、`lodash-es`、`@vicons/ionicons5`。  
+需要同时安装的 peer 依赖（版本可按项目统一）：
+- `vue` >= 3.3.0
+- `naive-ui` >= 2.38.0
+- `vue-router` >= 4.2.0
+- `dayjs` >= 1.11.0
+- `lodash-es` >= 4.17.21
+- `@vicons/ionicons5` >= 0.13.0
+
 如项目使用 `@` 别名，请确保存在对应的打包/运行时配置。
 
 ## 快速开始
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { DataForm, DataTable, commonDialogMethod } from 'core'
-import 'core/dist/style.css' // 如需默认样式
+import { DataForm, DataTable, commonDialogMethod } from '@xmszm/core'
+import '@xmszm/core/dist/style.css' // 如需默认样式
 
 const formValue = ref({})
 const formOptions = [

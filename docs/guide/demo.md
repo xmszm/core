@@ -14,7 +14,7 @@ npm install
 ```
 
 2) 在你的宿主工程中引入该组件文件（或复制内容），确保存在以下 alias：
-```js
+```javascript
 // vite / webpack 示例
 resolve: {
   alias: {
@@ -55,7 +55,7 @@ import {
   CommonQuery,
   createActionColumnJsx,
   DataTable,
-} from 'core'
+} from '@xmszm/core'
 
 // 列表数据与查询管理
 const { pageState, listQuery } = useNaivePage(() => {

@@ -8,7 +8,7 @@ title: CommonQuery
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { CommonQuery } from 'core'
+import { CommonQuery } from '@xmszm/core'
 
 const query = ref({})
 const options = [
@@ -22,7 +22,53 @@ function onSubmit() {
 </script>
 
 <template>
-  <CommonQuery v-model:query="query" :options="options" @submit="onSubmit" />
+  <CommonQuery v-model:query="query" :options="options" @submit="onSubmit" @reset="onReset" />
+</template>
+```
+
+### 完整示例（结合分页）
+
+```vue
+<script setup>
+import { reactive } from 'vue'
+import { CommonQuery } from '@xmszm/core'
+
+const listQuery = reactive({
+  page: 1,
+  pageSize: 10,
+  likeQuery: {
+    keyword: '',
+    type: '',
+  },
+})
+
+const queryOptions = [
+  { label: '关键词', key: 'keyword', queryType: 'likeQuery', way: 'input' },
+  { label: '类型', key: 'type', queryType: 'likeQuery', way: 'select', options: [
+    { label: '类型A', value: 'A' },
+    { label: '类型B', value: 'B' }
+  ]},
+]
+
+function handleSearch() {
+  listQuery.page = 1
+  fetchData()
+}
+
+function handleReset() {
+  listQuery.likeQuery = { keyword: '', type: '' }
+  listQuery.page = 1
+  fetchData()
+}
+</script>
+
+<template>
+  <CommonQuery
+    :query="listQuery"
+    :options="queryOptions"
+    @submit="handleSearch"
+    @reset="handleReset"
+  />
 </template>
 ```
 

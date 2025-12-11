@@ -1,9 +1,10 @@
-import { hasPermission } from '@/utils/permission'
+import { checkPermission } from '../../utils/config'
 import { NButton, NImage, NSpace, NSpin } from 'naive-ui'
 import { ref } from 'vue'
 import DataColumnCollet from './DataColumnCollet.jsx'
 import OprButton from './useDataColumnButton.jsx'
 import Pop from './useDataColumnPop.jsx'
+import { createDialogOptions } from '../../utils/dialog'
 
 export const rowIndexKey = (row, index) => (row ? JSON.stringify(row) : index)
 
@@ -39,7 +40,7 @@ export function createActionColumnJsx(
     actions = defaultOption
     actions.forEach((itm, idx) => {
       if (itm.permission) {
-        if (hasPermission(itm.permission)) {
+        if (checkPermission(itm.permission)) {
           if (!collectParams || idx < collect.max)
             width += itm?.label?.length * 12 + 36
 
@@ -77,101 +78,132 @@ export function createActionColumnJsx(
 
   return filterAction.length
     ? {
-        title: '操作',
-        key: 'opr',
-        fixed: 'right',
-        align: 'left',
-        width,
-        ...oprParams,
-        render(row, index) {
-          const vNodes = collect
-            ? (
-                <DataColumnCollet
-                  data={row}
-                  index={index}
-                  max={collect.max}
-                  options={filterAction}
-                />
-              )
-            : (
-                filterAction
-                  .map(
-                    (
-                      {
-                        isRender = () => true,
-                        onClick = null,
-                        mode = null,
-                        disabled = false,
-                        type = 'primary',
-                        ...action
-                      },
-                      i,
-                    ) => {
-                      return isRender?.(row)
+      title: '操作',
+      key: 'opr',
+      fixed: 'right',
+      align: 'left',
+      width,
+      ...oprParams,
+      render(row, index) {
+        const vNodes = collect
+          ? (
+            <DataColumnCollet
+              data={row}
+              index={index}
+              max={collect.max}
+              options={filterAction}
+            />
+          )
+          : (
+            filterAction
+              .map(
+                (
+                  {
+                    isRender = () => true,
+                    onClick = null,
+                    mode = null,
+                    disabled = false,
+                    type = 'primary',
+                    ...action
+                  },
+                  i,
+                ) => {
+                  return isRender?.(row)
+                    ? (
+                      mode === 'pop'
                         ? (
-                            mode === 'pop'
-                              ? (
-                                  <Pop
-                                    onClick={onClick}
-                                    row={row}
-                                    index={index}
-                                    action={action}
-                                    key={rowIndexKey(row, index) + i}
-                                  >
-                                    <NButton
-                                      text
-                                      disabled={disabled && disabled(row)}
-                                      type={disabled && disabled(row) ? 'default' : type}
-                                      {...action}
-                                    >
-                                      {typeof action?.label === 'function'
-                                        ? action?.label(row)
-                                        : action?.label}
-                                    </NButton>
-                                  </Pop>
-                                )
-                              : (
-                                  <OprButton
-                                    row={row}
-                                    action={{
-                                      ...action,
-                                      disabled,
-                                      onClick,
-                                      type,
-                                    }}
-                                    index={index}
-                                    key={rowIndexKey(row, index) + i}
-                                  />
-                                )
-                          )
-                        : undefined
-                    },
-                  )
-                  .filter(v => v)
+                          <Pop
+                            onClick={onClick}
+                            row={row}
+                            index={index}
+                            action={action}
+                            key={rowIndexKey(row, index) + i}
+                          >
+                            <NButton
+                              text
+                              disabled={disabled && disabled(row)}
+                              type={disabled && disabled(row) ? 'default' : type}
+                              {...action}
+                            >
+                              {typeof action?.label === 'function'
+                                ? action?.label(row)
+                                : action?.label}
+                            </NButton>
+                          </Pop>
+                        )
+                        : (
+                          <OprButton
+                            row={row}
+                            action={{
+                              ...action,
+                              disabled,
+                              onClick,
+                              type,
+                            }}
+                            index={index}
+                            key={rowIndexKey(row, index) + i}
+                          />
+                        )
+                    )
+                    : undefined
+                },
               )
-          return oprParams?.isRender
-            ? (
-                oprParams?.render(row)
-              )
-            : (
-                <NSpace
-                  align="center"
-                  wrap-item={false}
-                  size={18}
-                  key={rowIndexKey(row, index)}
-                >
-                  {vNodes}
-                </NSpace>
-              )
-        },
-      }
+              .filter(v => v)
+          )
+        return oprParams?.isRender
+          ? (
+            oprParams?.render(row)
+          )
+          : (
+            <NSpace
+              align="center"
+              wrap-item={false}
+              size={18}
+              key={rowIndexKey(row, index)}
+            >
+              {vNodes}
+            </NSpace>
+          )
+      },
+    }
     : undefined
 }
 
+/**
+ * 创建二维码弹窗
+ * @param {Object} row - 行数据
+ * @param {Function} fn - 获取二维码的函数
+ * @returns {Promise<boolean>}
+ * 
+ * @example
+ * import { useQRCode } from '@xmszm/core'
+ * 
+ * export default defineComponent({
+ *   setup() {
+ *     const showQR = useQRCode()
+ *     
+ *     const handleShowQR = (row) => {
+ *       showQR(row, async () => {
+ *         return await getQRCode(row.id)
+ *       })
+ *     }
+ *     
+ *     return { handleShowQR }
+ *   }
+ * })
+ */
 export async function createQRCode(row, fn = null) {
+  const dialogInstance = getDialogInstance()
+  
+  if (!dialogInstance) {
+    throw new Error('无法获取 dialog 实例。请使用 useQRCode hook 或在组件中通过 setupConfig 注册 dialog 实例。')
+  }
+  
   const code = ref(null)
   const loading = ref(false)
-  $dialog.info({
+  
+  const dialogOptions = createDialogOptions({
+    type: 'info',
     showIcon: false,
     style: {
       width: '350px',
@@ -186,7 +218,10 @@ export async function createQRCode(row, fn = null) {
         <div className="qr-title">{loading.value ? '' : row.name}</div>
       </div>
     ),
-  })
+  }, dialogInstance)
+  
+  dialogInstance.info(dialogOptions)
+  
   if (fn) {
     loading.value = true
     code.value = await fn()

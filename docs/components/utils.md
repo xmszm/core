@@ -7,8 +7,8 @@ title: 工具与常量
 ### createActionColumnJsx
 快速生成表格操作列。
 
-```js
-import { createActionColumnJsx } from 'core'
+```javascript
+import { createActionColumnJsx } from '@xmszm/core'
 
 const oprColumn = createActionColumnJsx(
   [
@@ -27,13 +27,13 @@ const oprColumn = createActionColumnJsx(
 
 ### ellipsis
 表格省略 tooltip 配置：
-```js
-import { ellipsis } from 'core/table/utils/ellipsis'
+```javascript
+import { ellipsis } from '@xmszm/core/table/utils/ellipsis'
 ```
 
 ## 上传工具
-```js
-import { registryUpload, customUpload, getFileUrl } from 'core'
+```javascript
+import { registryUpload, customUpload, getFileUrl } from '@xmszm/core'
 
 registryUpload((config) => axios.request(config)) // 注册实际上传实现
 await customUpload({ url: '/upload', data: file })

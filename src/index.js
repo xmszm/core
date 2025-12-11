@@ -1,4 +1,5 @@
 export { commonDialogMethod } from './dialog/commonDialog'
+export { useCommonDialog } from './dialog/useCommonDialog'
 
 export { default as DataForm } from './form/DataForm.vue'
 export {
@@ -9,7 +10,8 @@ export {
 export { default as Options } from './options/Options.jsx'
 export { default as CommonQuery } from './query/CommonQuery.vue'
 
-export { createActionColumnJsx } from './table/opr/useDataColumn'
+export { createActionColumnJsx, createQRCode } from './table/opr/useDataColumn'
+export { useQRCode } from './table/opr/useQRCode'
 
 export { default as OprButton } from './table/opr/useDataColumnButton.jsx'
 
@@ -29,18 +31,27 @@ export { ArrayToObject } from './utils/array'
 
 
 
-export { customUpload, registryUpload } from './utils/upload'
+export { customUpload, registryUpload, getFileUrl } from './utils/upload'
+export { setupConfig, getConfig, getBaseURL, getHasPermission, getUploadMethod, checkPermission, getDialogConfig, registerDialogInstance, getDialogInstance } from './utils/config'
+export { createDialog, createDialogMethods, createDialogOptions } from './utils/dialog'
 
 export { default as DataTable } from './table/DataTable.vue'
 
 
-export { labelField as globalLabelField,valueField as globalValueField } from './enum/options'
+export { labelField as globalLabelField, valueField as globalValueField } from './enum/options'
 
 
-export {initRules} from './dialog/utils/dialog.js'
+export { initRules } from './dialog/utils/dialog.js'
 
 export { ellipsis } from './table/utils/ellipsis.js'
 
 export { initRouteMeta } from './plugin/vite/initRouteMeta'
 
 export { orderEnum } from './enum/sort'
+
+// 导出插件和指令
+import CorePluginDefault from './plugin/index'
+export { CorePluginDefault as CorePlugin }
+export { install } from './plugin/index'
+export { permissionDirective } from './directives/permission'
+export { registerDirectives, autoRegisterDirectives, getGlobalApp } from './directives/auto-register'

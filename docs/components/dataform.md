@@ -8,7 +8,7 @@ title: DataForm
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { DataForm } from 'core'
+import { DataForm } from '@xmszm/core'
 
 const model = ref({})
 const options = [

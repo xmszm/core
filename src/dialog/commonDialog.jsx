@@ -1,8 +1,37 @@
-import { NButton, NSpace } from 'naive-ui'
+import { NButton, NSpace, useDialog, createDiscreteApi } from 'naive-ui'
 import { computed, reactive, ref, unref, watch } from 'vue'
 import DataForm from '../form/DataForm.vue'
 import { dialogDefaultOption } from './utils/dialog'
 import './style/commonDialog.less'
+
+// 全局缓存 dialog 实例，避免重复创建离散 API
+let globalDialogInstance = typeof $dialog !== 'undefined' ? $dialog : null
+let discreteDialogFactory = null
+
+function getDialogInstanceOnce() {
+  if (globalDialogInstance)
+    return globalDialogInstance
+
+  // 1. 组件上下文中尝试 useDialog（若无上下文会抛错）
+  try {
+    const dialog = useDialog()
+    if (dialog) {
+      globalDialogInstance = dialog
+      return globalDialogInstance
+    }
+  }
+  catch (e) {
+    // 忽略，继续尝试离散 API
+  }
+
+  // 2. 使用离散 API，且只创建一次
+  if (!discreteDialogFactory) {
+    const { dialog } = createDiscreteApi(['dialog'])
+    discreteDialogFactory = { dialog }
+  }
+  globalDialogInstance = discreteDialogFactory.dialog
+  return globalDialogInstance
+}
 
 /**
  *
@@ -41,6 +70,9 @@ export function commonDialogMethod(
   },
   dialogProps = null,
 ) {
+  // 优先使用外部注册的 $dialog；再尝试组件上下文 useDialog；再退回离散 API（仅全局创建一次）
+  const dialogInstance = getDialogInstanceOnce()
+  
   const defaultModeEnum = {
     none: { sub: '', read: false },
     create: { sub: '创建', read: false },
@@ -106,7 +138,7 @@ export function commonDialogMethod(
       ? () => titleFull(defaultModeEnum[mode]?.sub)
       : titleFull
 
-  const d = $dialog.create({
+  const d = dialogInstance.create({
     type: 'info',
     ...dialogDefaultOption,
     ...(!noTitle

@@ -7,20 +7,15 @@
  * @typedef {Promise<import('axios').AxiosResponse<UploadData>>} UploadDataPromise
  */
 
-import { BASE_URL } from '@/utils/request'
+import { getBaseURL, getUploadMethod, setupConfig } from './config'
 
 /**
- * 实际的上传实现函数
- * @type {null | ((AxiosRequestConfig) => UploadDataPromise)}
- */
-let uploadMethod = null
-
-/**
- * 注册上传方法
+ * 注册上传方法（兼容旧版 API）
  * @param {function(AxiosRequestConfig): UploadDataPromise} fn - 实际的上传实现函数
+ * @deprecated 请使用 setupConfig({ uploadMethod: fn }) 代替
  */
 export function registryUpload(fn) {
-  uploadMethod = fn
+  setupConfig({ uploadMethod: fn })
 }
 
 /**
@@ -29,17 +24,29 @@ export function registryUpload(fn) {
  * @returns {UploadDataPromise} 上传结果Promise
  */
 export function customUpload(...args) {
+  const uploadMethod = getUploadMethod()
   if (typeof uploadMethod !== 'function') {
-    throw new TypeError('请先通过 registryUpload(fn) 注册上传实现')
+    throw new TypeError('请先通过 setupConfig({ uploadMethod: fn }) 或 registryUpload(fn) 注册上传实现')
   }
   return uploadMethod(...args)
 }
 
+/**
+ * 获取文件 URL
+ * @param {string} url - 文件路径
+ * @param {number|null} ossSize - OSS 样式尺寸
+ * @returns {string} 完整的文件 URL
+ */
 export function getFileUrl(url, ossSize = null) {
   if (url && !url?.startsWith('http')) {
+    const baseURL = getBaseURL()
+    if (!baseURL) {
+      console.warn('BASE_URL 未配置，返回原始 URL。请使用 setupConfig({ baseURL: "..." }) 配置。')
+      return url
+    }
     return !ossSize
-      ? `${BASE_URL}${url}`
-      : `${BASE_URL}${url}?x-oss-process=style/w${ossSize}`
+      ? `${baseURL}${url}`
+      : `${baseURL}${url}?x-oss-process=style/w${ossSize}`
   }
   return url
 }

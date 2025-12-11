@@ -8,7 +8,7 @@ title: DataTable
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { DataTable } from 'core'
+import { DataTable } from '@xmszm/core'
 
 const columns = [
   { title: '名称', key: 'name', width: 160 },
@@ -29,20 +29,21 @@ const data = ref([
 - `data: Array` 数据源。
 - `columns: Array` 列定义，支持 `label`/`title`、`key`、`width`、`ellipsis`、`sorter` 等。
 - `pagination: Object | null` 透传 `n-data-table` 分页。
-- `oprColumns: Object | null` 右侧操作列配置。
-- `selectColumns: Object | null` 选择列。
-- `defaultColumns: Array` 默认可见列键。
-- `summaryColumns: Function` 汇总行。
+- `oprColumns: Object | null` 右侧操作列配置（模板中使用 `opr-columns`）。
+- `selectColumns: Object | null` 选择列（模板中使用 `select-columns`）。
+- `defaultColumns: Array` 默认可见列键（模板中使用 `default-columns`）。
+- `summaryColumns: Function` 汇总行（模板中使用 `summary-columns`）。
 - `isFilter: boolean` 是否启用列筛选。
 - `isEllipsis: boolean` 默认开启省略，使用内置 `ellipsis` tooltip。
 - `virtual: boolean` 虚拟滚动，默认数据量大时自动开启。
+- `rowKey: Function | String` 行键，用于标识每一行数据。
 
 ## 排序（orderEnum 内置工具）
 `orderEnum` 专为 `DataTable` 列排序提供，离开表格场景单独调用无意义。
 
 用法示例（结合后端查询参数与分页刷新）：
-```js
-import { orderEnum } from 'core'
+```javascript
+import { orderEnum } from '@xmszm/core'
 
 const listQuery = reactive({ sortFieldName: '', desc: false })
 const pageState = {
@@ -68,10 +69,46 @@ const columns = [
 - 弹窗使用 `FilterDialog` 组件记录用户选择，结果存储于 `localStorage`，Key 为 `filter_key + 路由全路径`。
 
 ## 省略
-- 默认对列开启 `ellipsis`，使用 `core/table/utils/ellipsis` 配置 tooltip 样式。
+- 默认对列开启 `ellipsis`，使用 `@xmszm/core/table/utils/ellipsis` 配置 tooltip 样式。
 - 可通过列的 `ellipsisProp` 自定义。
 
 ## 操作列
 - 可搭配 `createActionColumnJsx` 快速生成操作列，或直接传入 `oprColumns`。
 - `useDataColumnButton` / `useDataColumnPop` 组合了按钮与二次确认的通用场景。
+
+### 使用示例
+
+```vue
+<script setup>
+import { DataTable, createActionColumnJsx } from '@xmszm/core'
+
+const columns = [
+  { title: '名称', key: 'name', width: 160 },
+  { title: '类型', key: 'type', width: 120 },
+]
+
+const opr = createActionColumnJsx([
+  {
+    label: '编辑',
+    type: 'primary',
+    onClick: (row) => handleEdit(row),
+  },
+  {
+    label: '删除',
+    type: 'error',
+    mode: 'pop',
+    onClick: (row) => handleDelete(row),
+  },
+])
+</script>
+
+<template>
+  <DataTable
+    :data="tableData"
+    :columns="columns"
+    :opr-columns="opr"
+    :row-key="row => row?.id"
+  />
+</template>
+```
 

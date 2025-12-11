@@ -6,8 +6,8 @@ title: commonDialogMethod
 
 ## 基础用法（用函数包裹触发）
 `commonDialogMethod` 调用即会创建并打开弹窗，推荐用一个函数包裹，在需要时再触发：
-```js
-import { commonDialogMethod } from 'core'
+```javascript
+import { commonDialogMethod } from '@xmszm/core'
 
 function openEditDialog(row) {
   const { cancel, model } = commonDialogMethod(
@@ -54,7 +54,7 @@ openEditDialog(currentRow)
 - `modeEnum` 默认模式枚举。
 
 ## 自定义动作
-```js
+```javascript
 commonDialogMethod({
   action: [
     { label: '关闭', mode: 'cancel' },

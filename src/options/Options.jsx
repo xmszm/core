@@ -16,9 +16,23 @@ import {
 } from '../enum/options'
 import { getOptions } from './defaultOptions'
 import SvgIcon from '../image/SvgIcon.vue'
+import { registerDirectives, getGlobalApp } from '../directives/auto-register'
+import { getCurrentInstance } from 'vue'
 
 export default defineComponent(
   (props, { emit }) => {
+    // 自动注册 corePermission 指令（如果尚未注册）
+    // 必须在组件渲染前注册，确保指令可用
+    const instance = getCurrentInstance()
+    if (instance?.appContext?.app) {
+      registerDirectives(instance.appContext.app)
+    } else {
+      // 如果无法从实例获取，尝试使用全局应用实例
+      const globalApp = getGlobalApp()
+      if (globalApp) {
+        registerDirectives(globalApp)
+      }
+    }
     const _value = ref(props.value)
     const _isRead = computed(() => props.read || false)
 
@@ -62,9 +76,9 @@ export default defineComponent(
       (v) => {
         emit('update:value', v)
       }
-    ,{
-      immediate: true,
-    })
+      , {
+        immediate: true,
+      })
 
     function initProps(cProp) {
       let obj = {}
@@ -130,7 +144,7 @@ export default defineComponent(
           style={{
             width: '100%',
           }}
-          {...(item?.contentProps||{})}
+          {...(item?.contentProps || {})}
         >
           {initMain(item?.prefix)}
           {initMain(item?.default || item)}
@@ -205,7 +219,7 @@ export default defineComponent(
 
       return (
         <NFormItem
-          v-permission={item?.permission}
+          v-corePermission={item?.permission}
           key={index}
           showLabel={!item?.noLabel}
           {...item?.formItemProps}
@@ -231,31 +245,30 @@ export default defineComponent(
               >
                 {item?.labelSuffix
                   ? (
-                      typeof item?.labelSuffix === 'string'
-                        ? (
-                            <NIcon
-                              {...{
-                                class: 'wh-20px c-inherit',
-                                ...item?.labelSuffixProps,
-                              }}
-                            >
-                              <SvgIcon name={item?.labelSuffix} />
-                            </NIcon>
-                          )
-                        : (
-                            item?.labelSuffix?.()
-                          )
-                    )
+                    typeof item?.labelSuffix === 'string'
+                      ? (
+                        <NIcon
+                          {...{
+                            class: 'wh-20px c-inherit',
+                            ...item?.labelSuffixProps,
+                          }}
+                        >
+                          <SvgIcon name={item?.labelSuffix} />
+                        </NIcon>
+                      )
+                      : (
+                        item?.labelSuffix?.()
+                      )
+                  )
                   : (
-                      <></>
-                    )}
-                {`${
-                  unref(
-                    typeof item?.[props.labelField] === 'function'
-                      ? item?.[props.labelField]?.()
-                      : item?.[props.labelField],
-                  ) || ''
-                } ${_isRead.value || item.read ? '  ' : '  '}
+                    <></>
+                  )}
+                {`${unref(
+                  typeof item?.[props.labelField] === 'function'
+                    ? item?.[props.labelField]?.()
+                    : item?.[props.labelField],
+                ) || ''
+                  } ${_isRead.value || item.read ? '  ' : '  '}
               `}
               </div>
             ),
@@ -282,17 +295,17 @@ export default defineComponent(
               : unref(isRender)
           )
             ? (
-                item?.render
-                  ? (
-                      item?.render(unref(_value), index, {
-                        setValue,
-                        value: unref(_value),
-                      })
-                    )
-                  : (
-                      <CreateFormItem item={item} index={index} />
-                    )
-              )
+              item?.render
+                ? (
+                  item?.render(unref(_value), index, {
+                    setValue,
+                    value: unref(_value),
+                  })
+                )
+                : (
+                  <CreateFormItem item={item} index={index} />
+                )
+            )
             : null
         })}
       </NSpace>

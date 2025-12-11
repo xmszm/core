@@ -5,6 +5,14 @@ import { ref, unref } from 'vue'
 import Options from '../options/Options.jsx'
 import {initRules} from '../dialog/utils/dialog.js'
 import { toArray } from 'core'
+import { registerDirectives } from '../directives/auto-register'
+import { getCurrentInstance } from 'vue'
+
+// 自动注册指令
+const instance = getCurrentInstance()
+if (instance?.appContext?.app) {
+  registerDirectives(instance.appContext.app)
+}
 const props = defineProps({
   isNo: {
     type: Boolean,
