@@ -1,32 +1,45 @@
-name: Publish Package
+name: Publish to NPM
 
 on:
-  workflow_dispatch:
   push:
+    branches:
+      - main
+      - master
     tags:
-      - 'v*.*.*'
+      - 'v*'
+  workflow_dispatch:
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-          registry-url: https://registry.npmjs.org/
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
 
-      - name: Install
-        run: npm install --no-fund --no-audit
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build
         run: npm run build
 
-      - name: Publish
+      - name: Publish to NPM
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --access public
-
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] || [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            npm publish
+          else
+            echo "Skipping publish for non-tag push. Use workflow_dispatch or create a tag to publish."
+          fi

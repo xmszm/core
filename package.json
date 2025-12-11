@@ -57,6 +57,8 @@
     "vitepress": "^1.2.3",
     "vue": "^3.3.0",
     "vue-router": "^4.2.0"
+  },
+  "dependencies": {
+    "npm": "^11.7.0"
   }
 }
-
