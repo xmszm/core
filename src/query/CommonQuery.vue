@@ -1,9 +1,11 @@
-<script setup lang="jsx">
+<script setup lang="tsx">
 import { RefreshOutline, SearchOutline } from '@vicons/ionicons5'
-import { DataForm } from 'core'
-import { getOptions } from 'core/options/defaultOptions.jsx'
-import { ObjectToArray } from 'core/utils/object.js'
+import type { CommonQueryProps, CommonQueryEmits, FormOption } from '../../types/components'
+import DataForm from '../form/DataForm.vue'
+import { getOptions } from '../options/defaultOptions'
+import { ObjectToArray } from '../utils/object'
 import { computed, onMounted, onUnmounted, ref, getCurrentInstance } from 'vue'
+import { NButton, NSpace } from 'naive-ui'
 import { registerDirectives } from '../directives/auto-register'
 
 // 自动注册指令
@@ -13,76 +15,47 @@ if (instance?.appContext?.app) {
 }
 
 // 防抖函数
-function debounce(func, delay) {
-  let timeoutId
-  return function (...args) {
+function debounce<T extends (...args: any[]) => any>(func: T, delay: number): (...args: Parameters<T>) => void {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined
+  return function (...args: Parameters<T>) {
     clearTimeout(timeoutId)
     timeoutId = setTimeout(() => {
       func.apply(this, args)
     }, delay)
   }
 }
-const emit = defineEmits(['update:query', 'submit', 'reset'])
+const emit = defineEmits<CommonQueryEmits>()
 
-const props = defineProps({
-  inlineText: {
-    type: Boolean,
-    default: () => true,
-  },
-  options: {
-    type: Array,
-    default: () => [],
-  },
-  query: {
-    type: Object,
-    default: () => ({}),
-  },
-  selectCount: {
-    type: Number,
-    default: () => 1,
-  },
-  type: {
-    type: String,
-    default: () => 'primary',
-  },
-  noButton: {
-    type: Boolean,
-    default: () => false,
-  },
-  isRead: {
-    type: Boolean,
-    default: () => false,
-  },
-  btn: {
-    type: Array,
-    default: () => ['reset', 'search'],
-  },
-  size: {
-    type: String,
-    default: () => 'medium',
-  },
-
+const props = withDefaults(defineProps<CommonQueryProps>(), {
+  inlineText: true,
+  options: () => [],
+  query: () => ({}),
+  selectCount: 1,
+  type: 'primary',
+  noButton: false,
+  isRead: false,
+  btn: () => ['reset', 'search'],
+  size: 'medium',
 })
 
-function onBeforeOptions(arr){
-  return arr.map(v=>({
+function onBeforeOptions(arr: FormOption[]): FormOption[] {
+  return arr.map((v: FormOption) => ({
     ...v,
-    props:{
+    props: {
       ...v.props,
-    ...((!v.way ||v.way==='input')? {
-      onUpdateValue: (...v) => {
-        v.props?.onUpdateValue?.(...v)
+      ...((!v.way || v.way === 'input') ? {
+        onUpdateValue: (...args: any[]) => {
+          ;(v.props as any)?.onUpdateValue?.(...args)
         debouncedSubmit()
       }
-    }: {}),
+      } : {}),
     ...(v?.way === 'select' ? {
-      onUpdateValue: (...v) => {
-        v.props?.onUpdateValue?.(...v)
+        onUpdateValue: (...args: any[]) => {
+          ;(v.props as any)?.onUpdateValue?.(...args)
         debouncedSubmit()
       }
-    }: {})
+      } : {})
   }
-    
   }))
 }
 
@@ -115,9 +88,9 @@ const defaultOptions = getOptions(_queryOptionsKey.value)
 
 const _queryOptions = computed(() => {
   try {
-    const arr = []
-    for (let i = 0; i < props.options.length; i++) {
-      const v = props.options[i]
+    const arr: FormOption[] = []
+    for (let i = 0; i < (props.options?.length || 0); i++) {
+      const v = props.options![i]
       if (v?.enum && !v?.options)
         v.options = ObjectToArray(v.enum)
       if (!v?.props) {
@@ -130,19 +103,21 @@ const _queryOptions = computed(() => {
         v.formItemProps = { ...defaultFormItemProps }
       }
       else {
+        const formItemProps = typeof v.formItemProps === 'function'
+          ? v.formItemProps({}, {})
+          : v.formItemProps
         v.formItemProps = {
           ...defaultFormItemProps,
-          ...v.formItemProps,
-          style: { ...defaultFormItemProps.style, ...v.formItemProps.style },
+          ...formItemProps,
+          style: { ...defaultFormItemProps.style, ...(formItemProps as any)?.style },
         }
       }
 
-      const key = v?.key || v?.value
+      const key = v?.key || (v as any)?.value
       if (!key)
         throw new Error('key no set')
       arr.push({
         ...v,
-
         key,
       })
     }
@@ -196,35 +171,28 @@ const defaultBtn = {
   ),
 }
 
-function clearQuery() {
-  props.options.forEach((v) => {
-    const key = v?.key || v?.value
+function clearQuery(): void {
+  props.options?.forEach((v: FormOption) => {
+    const key = (v?.key as string) || (v as any)?.value
     if (key) {
-      if (v?.queryType)
-        _query.value[v.queryType][key] = null
-      else _query.value[key] = null
+      if (v?.queryType) {
+        if (!(_query.value as any)[v.queryType]) {
+          (_query.value as any)[v.queryType] = {}
+        }
+        (_query.value as any)[v.queryType][key] = null
+      }
+      else {
+        (_query.value as any)[key] = null
+      }
     }
   })
   emit('reset')
 }
 
 // 全局监听 Enter 键的方法
-function handleGlobalEnter(event) {
+function handleGlobalEnter(event: KeyboardEvent): void {
   // 检查是否按下了 Enter 键
   if (event.key === 'Enter') {
-    // 检查是否在输入框、选择框等表单元素中
-    // const target = event.target
-    // const isFormElement = target.tagName === 'INPUT' || 
-    //                      target.tagName === 'SELECT' || 
-    //                      target.tagName === 'TEXTAREA' ||
-    //                      target.contentEditable === 'true'
-    
-    // if (isFormElement) {
-    //   // 阻止默认行为（如换行）
-    //   event.preventDefault()
-    //   // 触发搜索
-     
-    // }
     onSubmit()
   }
 }

@@ -1,4 +1,5 @@
-<script setup lang="jsx">
+<script setup lang="tsx">
+import type { DataTableProps, DataTableExpose } from '../../types/components'
 import { ChevronDown, ChevronUp, Code, Funnel } from '@vicons/ionicons5'
 import { commonDialogMethod, toArray } from 'core'
 import { ellipsis } from 'core/table/utils/ellipsis'
@@ -17,70 +18,33 @@ if (instance?.appContext?.app) {
   registerDirectives(instance.appContext.app)
 }
 
-const props = defineProps({
-  data: {
-    type: Array,
-    default: () => [],
-  },
-  pagination: {
-    type: [Object, null],
-    default: () => undefined,
-  },
-  columns: {
-    type: Array,
-    default: () => [
+const props = withDefaults(defineProps<DataTableProps>(), {
+  data: () => [],
+  pagination: undefined,
+  columns: () => [
       {
         title: '测试案例',
       },
     ],
-  },
-  oprColumns: {
-    type: [Object, null],
-    default: () => null,
-  },
-  selectColumns: {
-    type: [Object, null],
-    default: () => null,
-  },
-  defaultColumns: {
-    type: Array,
-    default: () => [],
-  },
-  summaryColumns: {
-    type: null,
-    default: () => null,
-  },
-  emptyText: {
-    type: String,
-    default: () => '没有数据',
-  },
-  emptyIcon: {
-    type: String,
-    default: () => '',
-  },
-  isFilter: {
-    type: Boolean,
-    default: () => false,
-  },
-  isEllipsis: {
-    type: Boolean,
-    default: () => true,
-  },
-  virtual: {
-    type: null,
-    default: () => {},
-  },
-  singleColumn: {
-    type: Boolean,
-    default: () => false,
-  },
+  oprColumns: null,
+  selectColumns: null,
+  defaultColumns: () => [],
+  summaryColumns: null,
+  emptyText: '没有数据',
+  emptyIcon: '',
+  isFilter: false,
+  isEllipsis: true,
+  virtual: () => ({}),
+  singleColumn: false,
 })
 const route = useRoute()
 const FilterKey = 'filter_key'
-const emit = defineEmits(['sorted'])
+const emit = defineEmits<{
+  sorted: []
+}>()
 
 // 安全获取路由路径，如果没有路由上下文则使用默认值
-const getRoutePath = () => {
+const getRoutePath = (): string => {
   try {
     return route?.fullPath || route?.path || ''
   } catch {
@@ -93,12 +57,12 @@ const _data = computed(() => {
 
   return props.data
 })
-function setHeadFilter(val) {
+function setHeadFilter(val: Record<string, any>): void {
   window.localStorage.setItem(FilterKey, JSON.stringify(val))
 }
 
-function getHeadFilter() {
-  return JSON.parse(window.localStorage.getItem(FilterKey)) || {}
+function getHeadFilter(): Record<string, any> {
+  return JSON.parse(window.localStorage.getItem(FilterKey) || '{}') || {}
 }
 
 const getFilterAll = ref(getHeadFilter())
@@ -106,14 +70,14 @@ const headDefault = ref([])
 
 const scrollX = ref(0)
 
-function _summary(pageData) {
+function _summary(pageData: any[]): Record<string, { value: any }> | undefined {
   if (!props.summaryColumns)
     return
   return [
     props.selectColumns,
-    ...unref(props.columns),
+    ...unref(props.columns || []),
     props.oprColumns,
-  ]?.reduce((o, n) => {
+  ]?.reduce((o: Record<string, { value: any }>, n: any) => {
     if (n?.key)
       o[n.key] = props.summaryColumns?.(pageData)?.[n.key] || { value: null }
     else o[uniqueId('table')] = { value: null }
@@ -140,27 +104,27 @@ watch(
   },
 )
 
-function init() {
-  const columns = unref(props.columns)
+function init(): void {
+  const columns = unref(props.columns || [])
   const routePath = getRoutePath()
   headDefault.value
     = (routePath && getFilterAll.value?.[routePath])
-      || columns?.map((v, i) => v?.key || dayjs().valueOf() + i)
+      || columns?.map((v: any, i: number) => v?.key || String(dayjs().valueOf() + i))
 
-  const arr = props.isFilter
-    ? columns.filter(item => headDefault.value?.includes(item.key))
+  const arr: any[] = props.isFilter
+    ? columns.filter((item: any) => headDefault.value?.includes(item.key))
     : [...columns]
   if (props.selectColumns)
     arr.unshift({ key: 'selectKey', ...props.selectColumns })
   if (props.oprColumns)
     arr.push(props.oprColumns)
   let scrollNum = 0
-  _columns.value = arr.reduce((o, obj) => {
+  _columns.value = arr.reduce((o: any[], obj: any) => {
     if (obj?.display)
       console.log('display', obj?.display)
     if (!(obj?.display ?? true))
       return o
-    const v = {
+    const v: any = {
       'align': 'center',
       'width': 120,
       ...obj,
@@ -171,7 +135,7 @@ function init() {
             ? obj?.ellipsisProp(ellipsis)
             : ellipsis
           : false,
-      'ellipsis-component': 'ellipsis' || 'performant-ellipsis',
+      'ellipsis-component': 'ellipsis',
       'title': () => {
         const title = obj?.label || obj?.title || ''
         return (
@@ -183,8 +147,8 @@ function init() {
     }
 
     if (obj?.sorter) {
-      v.renderSorterIcon = ({ order }) => {
-        const { Icon, title } = orderEnum[order]
+      v.renderSorterIcon = ({ order }: { order: string }) => {
+        const { Icon, title } = orderEnum[order as keyof typeof orderEnum]
         return (
           <NTooltip>
             {{
@@ -196,14 +160,13 @@ function init() {
       }
       v.sorter = {
         multiple: 1,
-        fn:obj.sorter
+        fn: obj.sorter
       }
     }
 
-
     scrollNum += v?.width
-      ? Number.parseInt(v?.width)
-      : null || v?.title?.length * v.length + 30 || 0
+      ? Number.parseInt(String(v?.width))
+      : (typeof v?.title === 'string' ? v?.title?.length * 30 : 0) || 0
 
     o.push(v)
     return o
@@ -212,7 +175,7 @@ function init() {
   console.log('计算')
 }
 
-function filterButton() {
+function filterButton(): any {
   return (
     <NButton type="info" onClick={() => filterHandle()}>
       {{
@@ -223,13 +186,14 @@ function filterButton() {
   )
 }
 
-function filterHandle() {
+function filterHandle(): void {
   const { cancel } = commonDialogMethod(
     {
       title: '筛选字段',
       read: true,
       options: [
         {
+          key: 'filter-dialog',
           render: () => (
             <FilterDialog
               style={{
@@ -237,10 +201,10 @@ function filterHandle() {
                 margin: '0',
                 padding: 0,
               }}
-              filterItem={unref(props.columns)}
+              filterItem={unref(props.columns || [])}
               selectItem={headDefault.value}
               defaultItem={props.defaultColumns}
-              onSubmit={(v) => {
+              onSubmit={(v: string[]) => {
                 const routePath = getRoutePath()
                 if (routePath) {
                   getFilterAll.value[routePath] = v
@@ -263,32 +227,34 @@ function filterHandle() {
   )
 }
 
-function onSorter(e) {
+function onSorter(e: any): void {
   console.log('onSorter', e)
   if (!e)
     return
   const sortArr = toArray(e)
 
-  sortArr.forEach(v => {
+  sortArr.forEach((v: any) => {
     console.log('v', v)
     
     if (v?.sorter) {
-      v?.sorter?.fn
-      ((listQuery, pageState, key) => {
-        orderEnum[v.order]?.fn(listQuery, key)
+      v?.sorter?.fn?.(
+        (listQuery: any, pageState: any, key: string) => {
+          orderEnum[v.order as keyof typeof orderEnum]?.fn(listQuery, key)
         pageState.fetchData()
-      },{
+        },
+        {
         field: v?.columnKey,
-        value: orderEnum[v?.order]?.value,
-        isClick : !isProxy(v)
-      })
+          value: orderEnum[v?.order as keyof typeof orderEnum]?.value,
+          isClick: !isProxy(v)
+        }
+      )
     }
   })
 
   emit('sorted')
 }
 
-defineExpose({
+defineExpose<DataTableExpose>({
   filterHandle,
   filterButton,
   initColumns: init,

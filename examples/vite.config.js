@@ -23,16 +23,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
-      // 解决 npm/pnpm link 时模块和样式文件路径解析问题
-      // 直接指向源项目根目录，Vite 会通过 package.json 的 exports 正确解析
-      '@xmszm/core': path.resolve(__dirname, '..'),
-      '@xmszm/core/dist/style.css': path.resolve(__dirname, '../dist/style.css'),
     },
     dedupe: ['vue'],
-  },
-  optimizeDeps: {
-    include: ['@xmszm/core'],
-    exclude: ['@xmszm/core'],
   },
   server: {
     port: 3000,

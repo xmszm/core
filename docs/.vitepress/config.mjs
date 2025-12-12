@@ -16,6 +16,7 @@ export default defineConfig({
       { text: '指南', link: '/guide/quickstart' },
       { text: '组件', link: '/components/dataform' },
       { text: '工具', link: '/components/utils' },
+      { text: '版本历史', link: '/guide/changelog' },
       { text: '示例 Demo', link: '/guide/demo' },
     ],
     sidebar: {
@@ -24,8 +25,9 @@ export default defineConfig({
           text: '指南',
           items: [
             { text: '快速开始', link: '/guide/quickstart' },
-            { text: '配置指南', link: '/guide/config' },
+            { text: '初始化配置', link: '/guide/config' },
             { text: '本地开发', link: '/guide/local-development' },
+            { text: '版本历史', link: '/guide/changelog' },
             { text: '示例 Demo 说明', link: '/guide/demo' },
           ],
         },
@@ -53,6 +55,12 @@ export default defineConfig({
             { text: '操作列/排序/省略', link: '/components/utils' },
             { text: '上传', link: '/components/utils#上传工具' },
             { text: '权限与路由', link: '/components/utils#权限与路由' },
+          ],
+        },
+        {
+          text: '配置项',
+          items: [
+            { text: '配置项说明', link: '/components/config-options' },
           ],
         },
       ],

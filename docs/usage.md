@@ -20,11 +20,23 @@ yarn add @xmszm/core
 如项目使用 `@` 别名，请确保存在对应的打包/运行时配置。
 
 ## 快速开始
+
+### 全局引入样式（推荐）
+
+在项目的入口文件中全局引入样式：
+
+```javascript
+// main.js 或 main.ts
+import '@xmszm/core/dist/style.css'
+```
+
+### 组件中使用
+
 ```vue
 <script setup>
 import { ref } from 'vue'
 import { DataForm, DataTable, commonDialogMethod } from '@xmszm/core'
-import '@xmszm/core/dist/style.css' // 如需默认样式
+// 如果已在全局引入样式，这里无需重复引入
 
 const formValue = ref({})
 const formOptions = [
@@ -61,12 +73,13 @@ function openDialog() {
 
 ## 主要导出清单
 - 组件：`DataForm`、`Options`、`CommonQuery`、`DataTable`、`OprButton`、`Pop`
-- 方法：`commonDialogMethod`、`createActionColumnJsx`、`initRules`
+- 方法：`commonDialogMethod`、`createActionColumnJsx`、`initRules`（用于自动生成表单校验规则）
 - 工具：`toArray`、`ArrayToObject`、`ObjectToArray`、`customUpload`、`registryUpload`、`getFileUrl`
-- 常量：`orderEnum`、`globalLabelField`、`globalValueField`
+- 常量：`globalLabelField`（默认 `'name'`）、`globalValueField`（默认 `'id'`）
 - 路由辅助：`initRouteMeta`、`useApiConfig`、`useAuthPermission`、`cellectChildenPermission`
 
 ## 常见提示
 - 若打包时报 `@/utils/...` 未找到，请在宿主项目配置 `@` 路径或提供对应实现。
+- **样式引入**：推荐在全局入口文件（`main.js` 或 `main.ts`）中引入 `@xmszm/core/dist/style.css`，这样整个项目都可以使用默认样式，无需在每个组件中重复引入。
 - Vue TS 项目可直接使用内置 `types/index.d.ts` 获取基础类型提示。
 

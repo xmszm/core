@@ -1,10 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { NForm } from 'naive-ui'
-import { ref, unref } from 'vue'
+import { ref, unref, computed } from 'vue'
+import type { DataFormProps, DataFormExpose } from '../../types/components'
 
-import Options from '../options/Options.jsx'
-import {initRules} from '../dialog/utils/dialog.js'
-import { toArray } from 'core'
+import Options from '../options/Options'
+import { initRules } from '../dialog/utils/dialog'
+import { toArray } from '../utils/array'
 import { registerDirectives } from '../directives/auto-register'
 import { getCurrentInstance } from 'vue'
 
@@ -13,43 +14,16 @@ const instance = getCurrentInstance()
 if (instance?.appContext?.app) {
   registerDirectives(instance.appContext.app)
 }
-const props = defineProps({
-  isNo: {
-    type: Boolean,
-    default: () => true
-  },
-  read: {
-    type: Boolean,
-    default: () => false
-  },
-  labelField: {
-    type: String,
-    default: () => 'label'
-  },
-  contentStyle: {
-    type: Object,
-    default: () => ({})
-  },
-  options: {
-    type: Array,
-    default: () => []
-  },
-  rules: {
-    type: Object,
-    default: () => ({})
-  },
-  formProps: {
-    type: Object,
-    default: () => ({})
-  },
-  formItemProps: {
-    type: Object,
-    default: () => ({})
-  },
-  dialog: {
-    type: Boolean,
-    default: () => false
-  }
+const props = withDefaults(defineProps<DataFormProps>(), {
+  isNo: true,
+  read: false,
+  labelField: 'label',
+  contentStyle: () => ({}),
+  options: () => [],
+  rules: () => ({}),
+  formProps: () => ({}),
+  formItemProps: () => ({}),
+  dialog: false,
 })
 const _options = computed(() => props.options)
 // ====== 复制 initRules 逻辑 ======
@@ -76,27 +50,27 @@ const autoRules = computed(() => {
 })
 console.log(autoRules.value);
 
-defineExpose({
+defineExpose<DataFormExpose>({
   formRef,
   getRule: () => autoRules.value,
-  valid: (keyCode = []) =>{
-    console.log('?? valid',keyCode);
-    return new Promise((resolve, reject) => {
+  valid: (keyCode: string[] = []) => {
+    console.log('?? valid', keyCode)
+    return new Promise<void>((resolve, reject) => {
       const arrCode = toArray(keyCode)
-      formRef.value?.validate((v) => {
+      formRef.value?.validate((v: any) => {
         if (v) return reject(v)
         resolve()
-      },(v)=> arrCode.length ?  arrCode.includes(v?.key) : true)
+      }, (v: any) => arrCode.length ? arrCode.includes(v?.key) : true)
     })
   },
-  confirm: (fn) =>
-    new Promise((resolve, reject) => {
-      formRef.value?.validate((v) => {
+  confirm: (fn?: (model: any) => void) =>
+    new Promise<any>((resolve, reject) => {
+      formRef.value?.validate((v: any) => {
         if (v) return reject(v)
         fn && fn(unref(_model))
         resolve(unref(_model))
       })
-    })
+    }),
 })
 </script>
 

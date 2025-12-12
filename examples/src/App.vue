@@ -128,8 +128,8 @@ function onAdd(row = null, mode = 'add') {
         label: '类型',
         way: 'select',
         options: [
-          { label: '类型A', value: 'A' },
-          { label: '类型B', value: 'B' },
+          { name: '类型A', id: 'A' },
+          { name: '类型B', id: 'B' },
         ],
       },
     ],

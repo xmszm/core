@@ -7,15 +7,15 @@ export {
   getOptions,
   setupOptions,
 } from './options/defaultOptions'
-export { default as Options } from './options/Options.jsx'
+export { default as Options } from './options/Options'
 export { default as CommonQuery } from './query/CommonQuery.vue'
 
 export { createActionColumnJsx, createQRCode } from './table/opr/useDataColumn'
 export { useQRCode } from './table/opr/useQRCode'
 
-export { default as OprButton } from './table/opr/useDataColumnButton.jsx'
+export { default as OprButton } from './table/opr/useDataColumnButton'
 
-export { default as Pop } from './table/opr/useDataColumnPop.jsx'
+export { default as Pop } from './table/opr/useDataColumnPop'
 
 export { toArray } from './utils/array'
 
@@ -30,21 +30,34 @@ export { ObjectToArray } from './utils/object'
 
 export { ArrayToObject } from './utils/array'
 
-
-
 export { customUpload, registryUpload, getFileUrl } from './utils/upload'
-export { setupConfig, getConfig, getBaseURL, getHasPermission, getUploadMethod, checkPermission, getDialogConfig, registerDialogInstance, getDialogInstance } from './utils/config'
-export { createDialog, createDialogMethods, createDialogOptions } from './utils/dialog'
+export {
+  setupConfig,
+  getConfig,
+  getBaseURL,
+  getHasPermission,
+  getUploadMethod,
+  checkPermission,
+  getDialogConfig,
+  registerDialogInstance,
+  getDialogInstance,
+} from './utils/config'
+export {
+  createDialog,
+  createDialogMethods,
+  createDialogOptions,
+} from './utils/dialog'
 
 export { default as DataTable } from './table/DataTable.vue'
 
+export {
+  labelField as globalLabelField,
+  valueField as globalValueField,
+} from './enum/options'
 
-export { labelField as globalLabelField, valueField as globalValueField } from './enum/options'
+export { initRules } from './dialog/utils/dialog'
 
-
-export { initRules } from './dialog/utils/dialog.js'
-
-export { ellipsis } from './table/utils/ellipsis.js'
+export { ellipsis } from './table/utils/ellipsis'
 
 export { initRouteMeta } from './plugin/vite/initRouteMeta'
 
@@ -55,4 +68,8 @@ import CorePluginDefault from './plugin/index'
 export { CorePluginDefault as CorePlugin }
 export { install } from './plugin/index'
 export { permissionDirective } from './directives/permission'
-export { registerDirectives, autoRegisterDirectives, getGlobalApp } from './directives/auto-register'
+export {
+  registerDirectives,
+  autoRegisterDirectives,
+  getGlobalApp,
+} from './directives/auto-register'

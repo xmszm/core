@@ -34,9 +34,18 @@ yarn add @xmszm/core
 
 ### 引入组件和样式
 
+**推荐在全局入口文件中引入样式：**
+
+```javascript
+// main.js 或 main.ts
+import '@xmszm/core/dist/style.css' // 全局引入样式
+```
+
+**然后在组件中使用：**
+
 ```javascript
 import { DataForm, DataTable, CommonQuery, commonDialogMethod } from '@xmszm/core'
-import '@xmszm/core/dist/style.css'
+// 如果已在全局引入样式，这里无需重复引入
 ```
 
 ### 基础示例

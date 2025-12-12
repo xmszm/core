@@ -16,7 +16,7 @@ features:
   - title: 配置化表单
     details: 通过 Options 定义字段，自动生成 rules，轻松构建复杂表单。
   - title: 表格增强
-    details: 内置操作列创建器、排序、筛选、虚拟滚动与省略 tooltip。
+    details: 内置操作列创建器、筛选、虚拟滚动与省略 tooltip。
   - title: 弹窗集成
     details: commonDialogMethod 将表单与弹窗能力合并，减少样板代码。
   - title: 实用工具

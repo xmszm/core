@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@vicons/ionicons5": "^0.13.0",
-    "@xmszm/core": "link:C:/Users/admin/AppData/Local/pnpm/global/5/node_modules/@xmszm/core",
+    "@xmszm/core": "^0.0.2",
     "dayjs": "^1.11.0",
     "lodash-es": "^4.17.21",
     "naive-ui": "^2.38.0",

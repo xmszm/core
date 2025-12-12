@@ -2,7 +2,7 @@
 title: DataTable
 ---
 
-基于 `naive-ui` `n-data-table` 的增强组件，提供列筛选、操作列、排序、虚拟滚动与省略。
+基于 `naive-ui` `n-data-table` 的增强组件，提供列筛选、操作列、虚拟滚动与省略。
 
 ## 基础用法
 ```vue
@@ -25,44 +25,26 @@ const data = ref([
 </template>
 ```
 
-## Props（常用）
-- `data: Array` 数据源。
-- `columns: Array` 列定义，支持 `label`/`title`、`key`、`width`、`ellipsis`、`sorter` 等。
-- `pagination: Object | null` 透传 `n-data-table` 分页。
-- `oprColumns: Object | null` 右侧操作列配置（模板中使用 `opr-columns`）。
-- `selectColumns: Object | null` 选择列（模板中使用 `select-columns`）。
-- `defaultColumns: Array` 默认可见列键（模板中使用 `default-columns`）。
-- `summaryColumns: Function` 汇总行（模板中使用 `summary-columns`）。
-- `isFilter: boolean` 是否启用列筛选。
-- `isEllipsis: boolean` 默认开启省略，使用内置 `ellipsis` tooltip。
-- `virtual: boolean` 虚拟滚动，默认数据量大时自动开启。
-- `rowKey: Function | String` 行键，用于标识每一行数据。
+## Props
 
-## 排序（orderEnum 内置工具）
-`orderEnum` 专为 `DataTable` 列排序提供，离开表格场景单独调用无意义。
+| 字段名 | 必填 | 类型 | 说明 |
+|--------|------|------|------|
+| `data` | 否 | `Array` | 数据源，默认 `[]` |
+| `columns` | 否 | `Array` | 列定义，支持 `label`/`title`、`key`、`width`、`ellipsis` 等 |
+| `pagination` | 否 | `Object \| null` | 透传 `n-data-table` 分页配置 |
+| `oprColumns` | 否 | `Object \| null` | 右侧操作列配置（模板中使用 `opr-columns`） |
+| `selectColumns` | 否 | `Object \| null` | 选择列配置（模板中使用 `select-columns`） |
+| `defaultColumns` | 否 | `Array` | 默认可见列键（模板中使用 `default-columns`），默认 `[]` |
+| `summaryColumns` | 否 | `Function \| null` | 汇总行函数（模板中使用 `summary-columns`） |
+| `isFilter` | 否 | `boolean` | 是否启用列筛选，默认 `false` |
+| `isEllipsis` | 否 | `boolean` | 是否开启省略，使用内置 `ellipsis` tooltip，默认 `true` |
+| `virtual` | 否 | `boolean \| Object` | 虚拟滚动配置，默认数据量大时自动开启 |
+| `rowKey` | 否 | `Function \| String` | 行键，用于标识每一行数据 |
+| `emptyText` | 否 | `string` | 空数据提示文本，默认 `'没有数据'` |
+| `emptyIcon` | 否 | `string` | 空数据图标，默认 `''` |
+| `singleColumn` | 否 | `boolean` | 单列模式，默认 `false` |
 
-用法示例（结合后端查询参数与分页刷新）：
-```javascript
-import { orderEnum } from '@xmszm/core'
-
-const listQuery = reactive({ sortFieldName: '', desc: false })
-const pageState = {
-  fetchData: () => loadTableData(listQuery),
-}
-
-const columns = [
-  {
-    title: '创建时间',
-    key: 'createdAt',
-    width: 180,
-    sorter: (listQueryParam, pageStateParam, key) => {
-      // 选择升序/降序/默认时会进入这里
-      orderEnum.ascend.fn(listQueryParam, key) // 设置排序字段与方向
-      pageStateParam.fetchData() // 重新拉取数据
-    },
-  },
-]
-```
+## 事件
 
 ## 列筛选弹窗
 - 设定 `isFilter=true` 时，右上角会出现“筛选字段”按钮。
