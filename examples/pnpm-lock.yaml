@@ -5,7 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  core: link:C:/Users/admin/AppData/Local/pnpm/global/5/node_modules/@xmszm/core
   '@xmszm/core': link:C:/Users/admin/AppData/Local/pnpm/global/5/node_modules/@xmszm/core
 
 importers:

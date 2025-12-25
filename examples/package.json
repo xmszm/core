@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@vicons/ionicons5": "^0.13.0",
-    "@xmszm/core": "^0.0.2",
+    "@xmszm/core": "*",
     "dayjs": "^1.11.0",
     "lodash-es": "^4.17.21",
     "naive-ui": "^2.38.0",
