@@ -1,9 +1,9 @@
 <script setup lang="jsx">
 // import { FilePath } from '@/api/upload'
-import dayjs from 'dayjs'
-import { ref, watch } from 'vue'
-import { customUpload,getFileUrl } from '../utils/upload'
-
+import dayjs from "dayjs";
+import { ref, watch } from "vue";
+import { customUpload, getFileUrl } from "../utils/upload";
+import { NUpload, NSpace } from "naive-ui";
 const props = defineProps({
   value: {
     type: [Array, String],
@@ -39,27 +39,27 @@ const props = defineProps({
   },
   mode: {
     type: String,
-    default: () => 'fill',
+    default: () => "fill",
   },
-  formData:{
+  formData: {
     type: Object,
     default: () => {},
-  }
-})
+  },
+});
 
-const emit = defineEmits(['update:value', 'complete'])
+const emit = defineEmits(["update:value", "complete"]);
 
-const FilePath = '/admin/file'
+const FilePath = "/admin/file";
 
-const _value = ref([])
+const _value = ref([]);
 watch(
   () => props.value,
   (value) => {
-    console.log('props.value', value)
-    _value.value
-      = props.max === 1
+    console.log("props.value", value);
+    _value.value =
+      props.max === 1
         ? value
-          ? typeof value !== 'string'
+          ? typeof value !== "string"
             ? value?.length
               ? [
                   {
@@ -68,7 +68,7 @@ watch(
                     url: getFileUrl(value[0]),
                     thumbnailUrl: getFileUrl(value[0]),
                     fullPath: value[0],
-                    status: 'finished',
+                    status: "finished",
                   },
                 ]
               : []
@@ -79,85 +79,83 @@ watch(
                   url: getFileUrl(value),
                   fullPath: value,
                   thumbnailUrl: getFileUrl(value),
-                  status: 'finished',
+                  status: "finished",
                 },
               ]
           : []
         : value?.map((v, i) => ({
-          id: dayjs().valueOf() + i,
-          name: `img${dayjs().valueOf()}`,
-          url: getFileUrl(v),
-          fullPath: v,
-          thumbnailUrl: getFileUrl(v),
-          status: 'finished',
-        })) || []
+            id: dayjs().valueOf() + i,
+            name: `img${dayjs().valueOf()}`,
+            url: getFileUrl(v),
+            fullPath: v,
+            thumbnailUrl: getFileUrl(v),
+            status: "finished",
+          })) || [];
 
-    console.log('1', _value.value)
+    console.log("1", _value.value);
   },
-  { immediate: true },
-)
+  { immediate: true }
+);
 function customRequestMethod(...arg) {
-  sendImgRequest(arg[0])
+  sendImgRequest(arg[0]);
 }
 
 async function sendImgRequest({ file, onFinish, onError, onProgress }, fn) {
-  const formData = new FormData()
-  if (file.status === 'pending') {
-    formData.append('file', file.file)
-    if(props.formData && Object.keys(props.formData).length){
-      Object.keys(props.formData).forEach(key => {
-        formData.append(key, props.formData[key])
-      })
+  const formData = new FormData();
+  if (file.status === "pending") {
+    formData.append("file", file.file);
+    if (props.formData && Object.keys(props.formData).length) {
+      Object.keys(props.formData).forEach((key) => {
+        formData.append(key, props.formData[key]);
+      });
     }
     customUpload({
       url: FilePath,
       data: formData,
-      method: 'post',
+      method: "post",
       onUploadProgress: ({ percent }) => onProgress({ percent }),
     })
       .then((res) => {
-        const { url } = res.data
-        file.url = getFileUrl(url)
-        file.fullPath = url
-        file.thumbnailUrl = getFileUrl(url)
+        const { url } = res.data;
+        file.url = getFileUrl(url);
+        file.fullPath = url;
+        file.thumbnailUrl = getFileUrl(url);
         // onError()
-        onFinish()
-        onSubmit()
+        onFinish();
+        onSubmit();
       })
       .catch(() => {
-        file = null
-        onError()
+        file = null;
+        onError();
       })
       .finally(() => {
-        fn && fn()
-      })
+        fn && fn();
+      });
   }
 }
 
 function onSubmit() {
-  console.log('onSubmit', _value.value)
+  console.log("onSubmit", _value.value);
 
   const arr = _value.value.reduce((o, n) => {
-    if (n.status === 'finished' && n?.fullPath) {
-      o.push(n.fullPath)
+    if (n.status === "finished" && n?.fullPath) {
+      o.push(n.fullPath);
     }
-    return o
-  }, [])
+    return o;
+  }, []);
   if (props.max === 1 && arr.length === 1) {
-    emit('update:value', arr[0])
-  }
-  else if (arr.length) {
-    emit('update:value', arr)
-  }
-  else {
-    emit('update:value', props.max === 1 ? null : [])
+    emit("update:value", arr[0]);
+  } else if (arr.length) {
+    emit("update:value", arr);
+  } else {
+    emit("update:value", props.max === 1 ? null : []);
   }
 }
 </script>
 
 <template>
-  <n-space align="end" :wrap-item="false">
-    <n-upload
+  <NSpace align="end" :wrap-item="false">
+    <NUpload
       v-model:file-list="_value"
       accept=".jpeg,.jpg,.png"
       list-type="image-card"
@@ -176,9 +174,9 @@ function onSubmit() {
         ...(props.size
           ? { '--image-w': `${props.size}px`, '--image-h': `${props.size}px` }
           : {
-            '--image-w': `${props.width}px`,
-            '--image-h': `${props.height}px`,
-          }),
+              '--image-w': `${props.width}px`,
+              '--image-h': `${props.height}px`,
+            }),
         '--image-mode': props.mode,
       }"
       @finish="
@@ -196,7 +194,7 @@ function onSubmit() {
         }
       "
     />
-  </n-space>
+  </NSpace>
 </template>
 
 <style scoped lang="less">
@@ -224,7 +222,7 @@ function onSubmit() {
     .n-upload-file-info {
       position: relative;
       &::after {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -240,7 +238,7 @@ function onSubmit() {
     &::after {
       font-size: 12px;
       white-space: nowrap;
-      content: '上传失败~';
+      content: "上传失败~";
       position: absolute;
       color: rgba(255, 255, 255, 0.75);
       top: 50%;
@@ -254,7 +252,7 @@ function onSubmit() {
     &::after {
       font-size: 12px;
       white-space: nowrap;
-      content: '加载中~';
+      content: "加载中~";
       position: absolute;
       color: rgba(255, 255, 255, 0.75);
       top: 50%;

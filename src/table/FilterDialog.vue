@@ -1,11 +1,17 @@
 <script setup>
-import { useThemeVars } from 'naive-ui'
-import { ref, watchEffect } from 'vue'
+import {
+  useThemeVars,
+  NCheckboxGroup,
+  NCheckbox,
+  NButton,
+  NEllipsis,
+} from "naive-ui";
+import { ref, watchEffect } from "vue";
 
 const props = defineProps({
   type: {
     type: String,
-    default: () => 'primary',
+    default: () => "primary",
   },
   filterItem: {
     type: Array,
@@ -21,98 +27,97 @@ const props = defineProps({
   },
   filterButtonKey: {
     type: Array,
-    default: () => ['all', 'selectDefault'],
+    default: () => ["all", "selectDefault"],
     // default: () => ['all', 'selectDefault','currentSelect']
   },
-})
-const emit = defineEmits(['submit'])
-const theme = useThemeVars()
-const keySelect = ref([])
+});
+const emit = defineEmits(["submit"]);
+const theme = useThemeVars();
+const keySelect = ref([]);
 
 watchEffect(() => {
-  keySelect.value = props.selectItem
-})
-const filterButton = ref([])
+  keySelect.value = props.selectItem;
+});
+const filterButton = ref([]);
 const filterOprButton = [
   {
-    key: 'all',
-    label: '全选',
-    onCheck: () => (keySelect.value = props.filterItem?.map(v => v.key)),
+    key: "all",
+    label: "全选",
+    onCheck: () => (keySelect.value = props.filterItem?.map((v) => v.key)),
     unCheck: () => (keySelect.value = []),
   },
   {
-    key: 'selectDefault',
-    label: '选中默认',
+    key: "selectDefault",
+    label: "选中默认",
     onCheck: () => (keySelect.value = props.defaultItem),
     unCheck: () => (keySelect.value = props.selectItem),
   },
   {
-    key: 'currentSelect',
-    label: '选中当前列表',
+    key: "currentSelect",
+    label: "选中当前列表",
     onCheck: () => (keySelect.value = props.selectItem),
     unCheck: () => (keySelect.value = props.selectItem),
   },
-]
+];
 watchEffect(() => {
-  filterButton.value = filterOprButton.filter(v =>
-    props.filterButtonKey.includes(v.key),
-  )
-  console.log(props.filterButtonKey)
-})
+  filterButton.value = filterOprButton.filter((v) =>
+    props.filterButtonKey.includes(v.key)
+  );
+  console.log(props.filterButtonKey);
+});
 
 function onSubmit() {
-  emit('submit', keySelect.value)
+  emit("submit", keySelect.value);
 }
 
 const checkKey = ref(
-  props.filterItem?.length === props.selectItem?.length ? ['all'] : [],
-)
+  props.filterItem?.length === props.selectItem?.length ? ["all"] : []
+);
 
 function onCheckModel(string, meta) {
-  console.log(string)
-  console.log(meta)
-  if (meta.actionType === 'uncheck') {
-    filterButton.value?.find(v => v?.key === meta.value)?.unCheck()
-    checkKey.value = []
-  }
-  else {
-    filterButton.value?.find(v => v?.key === meta.value)?.onCheck()
-    checkKey.value = [meta.value]
+  console.log(string);
+  console.log(meta);
+  if (meta.actionType === "uncheck") {
+    filterButton.value?.find((v) => v?.key === meta.value)?.unCheck();
+    checkKey.value = [];
+  } else {
+    filterButton.value?.find((v) => v?.key === meta.value)?.onCheck();
+    checkKey.value = [meta.value];
   }
 }
 </script>
 
 <template>
   <div class="filter-box">
-    <n-checkbox-group v-model:value="keySelect" class="filter-main">
-      <n-checkbox
+    <NCheckboxGroup v-model:value="keySelect" class="filter-main">
+      <NCheckbox
         v-for="item in filterItem"
         :key="item.key"
         :value="item.key"
         class="filter-item"
       >
-        <n-ellipsis style="max-width: 100px">
+        <NEllipsis style="max-width: 100px">
           {{ item.title }}
-        </n-ellipsis>
-      </n-checkbox>
-    </n-checkbox-group>
+        </NEllipsis>
+      </NCheckbox>
+    </NCheckboxGroup>
     <div class="filter-footer">
-      <n-checkbox-group
+      <NCheckboxGroup
         :type="props.type"
         :value="checkKey"
         @update:value="onCheckModel"
       >
-        <n-checkbox
+        <NCheckbox
           v-for="item in filterButton"
           :key="item.key"
           :value="item.key"
         >
           {{ item.label }}
-        </n-checkbox>
-      </n-checkbox-group>
-      <n-button class="submit-btn" :type="props.type" @click="onSubmit">
+        </NCheckbox>
+      </NCheckboxGroup>
+      <NButton class="submit-btn" :type="props.type" @click="onSubmit">
         保存
-      </n-button>
+      </NButton>
     </div>
   </div>
 </template>
