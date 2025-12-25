@@ -4,7 +4,14 @@
  * 本文件包含所有组件的详细类型定义，包括 props、options 和 expose
  */
 
-import type { Component, VNode } from 'vue'
+import type { Component, VNode, Ref } from 'vue'
+
+// Vue 组件类型声明
+declare module '*.vue' {
+  import type { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
 
 /**
  * 表单选项配置项
@@ -119,7 +126,8 @@ export interface CommonDialogOptions {
   isRead?: boolean
   action?: DialogAction[] | ((helpers: { formRef: any; data: any; d: any; close: () => void }) => VNode)
   contentStyle?: Record<string, any>
-  actionProps?: Record<string, any>
+  actionProps?: Record<string, any>,
+  render?: () => VNode
 }
 
 /**

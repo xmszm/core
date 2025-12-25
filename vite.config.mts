@@ -2,12 +2,20 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import AutoImport from 'unplugin-auto-import/vite'
+import UnoCSS from 'unocss/vite'
 import path from 'node:path'
 
 export default defineConfig({
   plugins: [
     vue(),
-    vueJsx(),
+    vueJsx({
+      // 确保 JSX 转换配置正确
+      transformOn: true,
+      mergeProps: true,
+      // 确保处理所有 .tsx 文件
+      include: /\.(tsx|jsx)$/,
+    }),
+    UnoCSS(),
     AutoImport({
       imports: [
         'vue',
@@ -27,12 +35,26 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
   },
+
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'src/index.ts'),
-      name: 'NexCore',
+      entry: {
+        index: path.resolve(__dirname, 'src/index.ts'),
+        // Vite 插件单独入口
+        'plugin/vite/initRouteMeta': path.resolve(__dirname, 'src/plugin/vite/initRouteMeta.ts'),
+      },
       formats: ['es', 'cjs'],
-      fileName: (format) => (format === 'es' ? 'index.mjs' : 'index.cjs'),
+      fileName: (format, entryName) => {
+        if (entryName === 'index') {
+          return format === 'es' ? 'index.mjs' : 'index.cjs'
+        }
+        // 插件文件保持相对路径结构
+        const ext = format === 'es' ? 'mjs' : 'cjs'
+        return `${entryName}.${ext}`
+      },
+    },
+    commonjsOptions: {
+      transformMixedEsModules: true,
     },
     rollupOptions: {
       external: [
@@ -52,8 +74,11 @@ export default defineConfig({
           'lodash-es': 'lodashEs',
           '@vicons/ionicons5': 'ViconsIonicons5',
         },
+        // 保持目录结构
+        preserveModules: false,
       },
     },
   },
+
 })
 

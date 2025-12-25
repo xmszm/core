@@ -46,3 +46,10 @@ declare module '@/utils/request' {
    */
   export const BASE_URL: string
 }
+
+// 声明全局 $dialog（如果存在）
+// 外部可以通过 window.$dialog 或直接 $dialog 注入 dialog 实例
+declare global {
+  // eslint-disable-next-line no-var
+  var $dialog: import('naive-ui').DialogApi | undefined
+}
