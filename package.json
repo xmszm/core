@@ -26,7 +26,11 @@
       "require": "./dist/plugin/vite/initRouteMeta.cjs",
       "types": "./types/plugin/vite/initRouteMeta.d.ts"
     },
-    "./dist/style.css": "./dist/style.css",
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css",
+      "types": "./types/style.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "files": [
