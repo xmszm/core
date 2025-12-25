@@ -4,21 +4,13 @@ import {
   valueField as globalValueField,
 } from '../enum/options'
 
-export function ArrayToObject<T extends Record<string, any> = any>(
-  arr: T[] = [],
-  {
-    labelField = globalLabelField,
-    valueField = globalValueField,
-  }: {
-    labelField?: string
-    valueField?: string
-  } = {
-    labelField: globalLabelField,
-    valueField: globalValueField,
-  },
-): Record<string, T> {
-  return unref(arr).reduce((o: Record<string, T>, n: T) => {
-    o[n[valueField] as string] = {
+export function ArrayToObject(
+  arr: any[] = [],
+  labelField: string = globalLabelField,
+  valueField: string = globalValueField,
+) {
+  return unref(arr).reduce((o, n) => {
+    o[n[valueField]] = {
       ...n,
       [labelField]: n[labelField],
       [valueField]: n[valueField],
@@ -27,6 +19,6 @@ export function ArrayToObject<T extends Record<string, any> = any>(
   }, {})
 }
 
-export function toArray<T = any>(v: T | T[]): T[] {
+export function toArray(v: any) {
   return Array.isArray(v) ? v : [v]
 }

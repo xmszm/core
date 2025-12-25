@@ -9,9 +9,9 @@ import { getDialogConfig, getDialogInstance as getRegisteredDialogInstance } fro
 /**
  * 获取 dialog 实例
  * 优先从配置中获取（如果已注册），否则从当前组件实例获取
- * @returns dialog 实例或 null
+ * @returns {Object|null} dialog 实例
  */
-export function getDialogInstance(): any {
+export function getDialogInstance() {
   // 1. 优先从配置中获取（如果外部已注册）
   const registered = getRegisteredDialogInstance()
   if (registered) {
@@ -38,11 +38,11 @@ export function getDialogInstance(): any {
 
 /**
  * 创建 dialog 配置，应用主题色继承设置
- * @param options - dialog 选项
- * @param dialogInstance - dialog 实例（从 useDialog 获取）
- * @returns 处理后的 dialog 选项
+ * @param {Object} options - dialog 选项
+ * @param {Object} dialogInstance - dialog 实例（从 useDialog 获取）
+ * @returns {Object} 处理后的 dialog 选项
  */
-export function createDialogOptions(options: Record<string, any> = {}, dialogInstance: any = null): Record<string, any> {
+export function createDialogOptions(options: Record<string, any> = {}, dialogInstance: any = null) {
   const dialogConfig = getDialogConfig()
 
   // 如果配置了不继承主题色，则添加 themeOverrides
@@ -62,11 +62,11 @@ export function createDialogOptions(options: Record<string, any> = {}, dialogIns
 /**
  * 使用 dialog 的工具函数
  * 在组件中使用：const dialog = useDialog(); createDialog(dialog, options)
- * @param dialogInstance - dialog 实例（从 useDialog 获取）
- * @param options - dialog 选项
- * @returns dialog 返回的对象
+ * @param {Object} dialogInstance - dialog 实例（从 useDialog 获取）
+ * @param {Object} options - dialog 选项
+ * @returns {Object} dialog 返回的对象
  */
-export function createDialog(dialogInstance: any, options: Record<string, any> = {}): any {
+export function createDialog(dialogInstance: any, options: Record<string, any> = {}) {
   if (!dialogInstance) {
     throw new Error('dialogInstance 是必需的。请在组件中使用 useDialog() 获取实例，然后传递给此函数。')
   }
@@ -77,39 +77,34 @@ export function createDialog(dialogInstance: any, options: Record<string, any> =
 
 /**
  * Dialog 快捷方法
- * @param dialogInstance - dialog 实例
+ * @param {Object} dialogInstance - dialog 实例
  */
-export function createDialogMethods(dialogInstance: any): {
-  info: (options: Record<string, any>) => any
-  success: (options: Record<string, any>) => any
-  warning: (options: Record<string, any>) => any
-  error: (options: Record<string, any>) => any
-  create: (options: Record<string, any>) => any
-} {
+export function createDialogMethods(dialogInstance) {
   if (!dialogInstance) {
     throw new Error('dialogInstance 是必需的。请在组件中使用 useDialog() 获取实例。')
   }
 
   return {
-    info: (options: Record<string, any>) => {
+    info: (options) => {
       const finalOptions = createDialogOptions({ type: 'info', ...options }, dialogInstance)
       return dialogInstance.info(finalOptions)
     },
-    success: (options: Record<string, any>) => {
+    success: (options) => {
       const finalOptions = createDialogOptions({ type: 'success', ...options }, dialogInstance)
       return dialogInstance.success(finalOptions)
     },
-    warning: (options: Record<string, any>) => {
+    warning: (options) => {
       const finalOptions = createDialogOptions({ type: 'warning', ...options }, dialogInstance)
       return dialogInstance.warning(finalOptions)
     },
-    error: (options: Record<string, any>) => {
+    error: (options) => {
       const finalOptions = createDialogOptions({ type: 'error', ...options }, dialogInstance)
       return dialogInstance.error(finalOptions)
     },
-    create: (options: Record<string, any>) => {
+    create: (options) => {
       const finalOptions = createDialogOptions(options, dialogInstance)
       return dialogInstance.create(finalOptions)
     },
   }
 }
+

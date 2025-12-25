@@ -45,7 +45,7 @@ export default defineComponent(
   {
     props: {
       onClick: {
-        type: [Function, null],
+        type: Function as any,
         default: null,
       },
       row: {

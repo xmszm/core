@@ -8,7 +8,7 @@ import { registerDialogInstance } from '../../utils/config'
 
 /**
  * 使用 QRCode 的 Hook
- * @returns showQRCode 函数
+ * @returns {Function} showQRCode 函数
  * 
  * @example
  * import { useQRCode } from '@xmszm/core'
@@ -27,16 +27,14 @@ import { registerDialogInstance } from '../../utils/config'
  *   }
  * })
  */
-export function useQRCode(): (
-  row: any,
-  fn?: () => Promise<string> | string
-) => Promise<boolean> {
+export function useQRCode() {
   const dialog = useDialog()
   
   // 注册 dialog 实例到全局配置
   registerDialogInstance(dialog)
   
-  return (row: any, fn?: () => Promise<string> | string) => {
+  return (row, fn) => {
     return createQRCode(row, fn)
   }
 }
+

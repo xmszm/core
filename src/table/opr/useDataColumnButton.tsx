@@ -28,16 +28,16 @@ export default defineComponent(
               if (loading) {
                 oprBtnLoading.value = true
               }
-              await onClick(row, index)
+              await onClick(row)
             }
             finally {
               setTimeout(() => (oprBtnLoading.value = false), 500)
             }
           }
         }}
-        disabled={disabled && disabled(row)}
+        disabled={typeof disabled === 'function' ? disabled(row) : disabled}
         loading={oprBtnLoading.value}
-        type={disabled && disabled(row) ? 'default' : type}
+        type={typeof disabled === 'function' && disabled(row) ? 'default' : type}
         {...other}
       >
         {typeof label === 'function' ? label?.(row) : label}

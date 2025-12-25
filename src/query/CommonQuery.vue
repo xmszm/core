@@ -209,7 +209,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <n-space
+  <NSpace
     :wrap-item="false"
     justify="space-between"
     align="center"
@@ -222,14 +222,14 @@ onUnmounted(() => {
         :form-props="{ showFeedback: false }"
       />
     </div>
-    <n-space v-if="!props.noButton" align="center" :wrap="false">
+    <NSpace v-if="!props.noButton" align="center" :wrap="false">
       <slot name="left-btn" />
       <template v-for="(itm, idx) in props.btn" :key="idx">
         <component :is="defaultBtn?.[itm]?.()" />
       </template>
       <slot name="right-btn" />
-    </n-space>
-  </n-space>
+    </NSpace>
+  </NSpace>
 </template>
 
 <style scoped lang="less">

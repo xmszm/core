@@ -1,28 +1,31 @@
 import { NButton, NSpace, useDialog, createDiscreteApi } from 'naive-ui'
-import { computed, reactive, ref, unref, watch, type Ref, type VNode } from 'vue'
-import type { CommonDialogOptions, CommonDialogResult, DialogAction, FormOption } from '../../types/components'
+import type { DialogApi } from 'naive-ui'
+import { reactive, ref, unref, defineComponent } from 'vue'
+import type { Ref, VNode } from 'vue'
+import type { CommonDialogOptions, DialogAction } from '../../types/components'
+import type { CommonDialogResult } from '../../types'
 import DataForm from '../form/DataForm.vue'
 import { dialogDefaultOption } from './utils/dialog'
-import { getDialogInstance } from '../utils/config'
 import './style/commonDialog.less'
 
+// 声明全局 $dialog 变量（外部可能注入）
+declare global {
+  // eslint-disable-next-line no-var
+  var $dialog: DialogApi | undefined
+}
+
 // 全局缓存 dialog 实例，避免重复创建离散 API
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let globalDialogInstance: any = null
 let discreteDialogFactory: { dialog: any } | null = null
-
-// 声明全局 $dialog（如果存在）
-declare global {
-  var $dialog: any
-}
 
 function getDialogInstanceOnce(): any {
   if (globalDialogInstance)
     return globalDialogInstance
 
-  // 1. 尝试从配置中获取
-  const configInstance = getDialogInstance()
-  if (configInstance) {
-    globalDialogInstance = configInstance
+  // 1. 检查全局 $dialog
+  if (typeof $dialog !== 'undefined' && $dialog) {
+    globalDialogInstance = $dialog
     return globalDialogInstance
   }
 
@@ -86,7 +89,7 @@ export function commonDialogMethod(
   // 优先使用外部注册的 $dialog；再尝试组件上下文 useDialog；再退回离散 API（仅全局创建一次）
   const dialogInstance = getDialogInstanceOnce()
   
-  const defaultModeEnum = {
+  const defaultModeEnum: Record<string, { sub?: string; read?: boolean }> = {
     none: { sub: '', read: false },
     create: { sub: '创建', read: false },
     add: { sub: '添加', read: false },
@@ -102,7 +105,7 @@ export function commonDialogMethod(
   const actionLoading = reactive<boolean[]>([])
   const model = ref({ ...valueData })
   const defaultActionProps = {
-    justify: 'end',
+    justify: 'end' as 'end',
     wrapItem: false,
     style: {
       width: '100%',
@@ -140,15 +143,100 @@ export function commonDialogMethod(
           })
           : cancel(),
     },
-  ]
+  ];
 
-  ;(action || defaultAction).forEach((v, i) => {
+  (Array.isArray(action) ? action : defaultAction).forEach((v, i) => {
     actionLoading[i] = false
   })
-  const titleRender
-    = typeof titleFull === 'function'
-      ? () => titleFull(defaultModeEnum[mode]?.sub || '')
-      : titleFull
+  const titleRender = typeof titleFull === 'function'
+    ? () => titleFull(defaultModeEnum[mode]?.sub || '')
+    : titleFull
+
+  // 使用 ref 存储 dialog 实例，以便在函数中访问
+  const dialogRef: Ref<any> = ref()
+
+  function cancel(): void {
+    console.log('取消', model.value)
+    dialogRef.value?.destroy()
+  }
+
+  async function validate(arr: string[] = []): Promise<void> {
+    console.log('开启验证')
+    await formRef.value?.valid()
+  }
+
+  async function comfirm(fn?: () => any): Promise<any> {
+    return fn && fn()
+  }
+
+  const renderAction = !(read ?? isRead)
+    ? typeof action === 'function'
+      ? () => action({ formRef, data: unref(model), d: dialogRef.value, close: cancel })
+      : () => (
+          <NSpace
+            {...defaultActionProps}
+            {...actionProps}
+            style={{
+              ...defaultActionProps?.style,
+              ...(actionProps?.style || {}),
+            }}
+          >
+            {(Array.isArray(action) ? action : defaultAction).map((v, i) =>
+              v?.render
+                ? (
+                    v?.render?.()
+                  )
+                : (
+                    <NButton
+                      type="primary"
+                      ghost={v.mode === 'cancel'}
+                      {...(v?.props || {})}
+                      {...(actionProps?.buttonProps || {})}
+                      style={{ ...defaultButtonStyle, ...(v?.style || {}) }}
+                      loading={actionLoading[i]}
+                      onClick={async () => {
+                        if (v.mode === 'cancel') {
+                          dialogRef.value?.destroy()
+                        }
+                        else {
+                          const showLoading = () => (actionLoading[i] = true)
+                          const hideLoading = () => (actionLoading[i] = false)
+                          if (v?.loading)
+                            showLoading()
+                          try {
+                            console.log('model', unref(model))
+                            
+                            if (v?.valid)
+                              await validate()
+                            console.log(v?.valid)
+                            if (v?.valid || v?.loading)
+                              showLoading()
+                            await v?.onClick?.({
+                              model: unref(model),
+                              comfirm,
+                              cancel,
+                              validate,
+                              showLoading,
+                              hideLoading,
+                            })
+                          }
+                          catch (e) {
+                            console.log(e)
+                          }
+                          finally {
+                            if (v?.valid || v?.loading)
+                              hideLoading()
+                          }
+                        }
+                      }}
+                    >
+                      {v.label || ''}
+                    </NButton>
+                  ),
+            )}
+          </NSpace>
+        )
+    : null
 
   const d = dialogInstance.create({
     type: 'info',
@@ -165,7 +253,7 @@ export function commonDialogMethod(
           formRef.value = v
         }}
         options={options}
-        v-model:value={model.value}
+        v-model:value={model}
         isNo={isNo}
         read={read ?? isRead}
         labelField={labelField}
@@ -174,96 +262,24 @@ export function commonDialogMethod(
         dialog
       />
     ),
-    action: !(read ?? isRead)
-      ? typeof action === 'function'
-        ? () => action({ formRef, data: unref(model), d, close: cancel })
-        : () => (
-            <NSpace
-              {...defaultActionProps}
-              {...actionProps}
-              style={{
-                ...defaultActionProps?.style,
-                ...(actionProps?.style || {}),
-              }}
-            >
-              {(action || defaultAction).map((v, i) =>
-                v?.render
-                  ? (
-                      v?.render?.()
-                    )
-                  : (
-                      <NButton
-                        type="primary" ghost={v.mode === 'cancel'} {...({ ...v?.props, ...actionProps?.buttonProps } || {})}
-                        style={{ ...defaultButtonStyle, ...(v?.style || {}) }}
-                        loading={actionLoading[i]}
-                        onClick={async () => {
-                          if (v.mode === 'cancel') {
-                            d.destroy()
-                          }
-                          else {
-                            const showLoading = () => (actionLoading[i] = true)
-                            const hideLoading = () => (actionLoading[i] = false)
-                            if (v?.loading)
-                              showLoading()
-                            try {
-                              console.log('model', unref(model));
-                              
-                              if (v?.valid)
-                                await validate()
-                              console.log(v?.valid)
-                              if (v?.valid || v?.loading)
-                                showLoading()
-                              await v?.onClick?.({
-                                model: unref(model),
-                                comfirm,
-                                cancel,
-                                validate,
-                                showLoading,
-                                hideLoading,
-                              })
-                            }
-                            catch (e) {
-                              console.log(e)
-                            }
-                            finally {
-                              if (v?.valid || v?.loading)
-                                hideLoading()
-                            }
-                          }
-                        }}
-                      >
-                        {v.label || ''}
-                      </NButton>
-                    ),
-              )}
-            </NSpace>
-          )
-      : null,
+    action: renderAction,
     // ...readButton.value,
     ...dialogProps,
-    class: `core-dialog ${ unref(read) ? 'core-dialog-read' : ''} ${dialogProps?.class || ''}`,
+    class: `core-dialog ${(read ?? isRead) ? 'core-dialog-read' : ''} ${dialogProps?.class || ''}`,
   })
 
-  function cancel() {
-    console.log('取消', model.value)
+  // 将 dialog 实例存储到 ref 中
+  dialogRef.value = d
 
-    d?.destroy()
-  }
-
-  async function validate(arr: string[] = []): Promise<void> {
-    console.log('开启验证')
-    await formRef.value?.valid()
-  }
-
-  async function comfirm(fn?: () => any): Promise<any> {
-    return fn && fn()
-  }
+  // onBeforeUnmount(() => {
+  //   console.log('commomDialog end')
+  //   cancel()
+  // })
 
   return {
     cancel,
-    setValue: (v: any, str?: string) =>
-      str ? (model.value[str] = v) : (model.value = { ...model.value, ...v }),
+    setValue: (v: any, str?: string) => str ? (model.value[str] = v) : (model.value = { ...model.value, ...v }),
     model: unref(model),
-    modeEnum: defaultModeEnum,
-  }
+    modeEnum: defaultModeEnum
+  };
 }

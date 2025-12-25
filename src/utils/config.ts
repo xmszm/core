@@ -3,18 +3,10 @@
  * 用于统一管理库的外部依赖配置
  */
 
-interface ConfigOptions {
-  baseURL?: string
-  hasPermission?: (permission: string) => boolean
-  uploadMethod?: (config: any) => Promise<any>
-  dialog?: {
-    instance?: any
-    inheritTheme?: boolean
-    themeOverrides?: any
-  }
-}
-
-interface Config {
+/**
+ * 配置对象类型定义
+ */
+interface ConfigType {
   baseURL: string
   hasPermission: ((permission: string) => boolean) | null
   uploadMethod: ((config: any) => Promise<any>) | null
@@ -28,7 +20,7 @@ interface Config {
 /**
  * 配置对象
  */
-const config: Config = {
+const config: ConfigType = {
   // API 基础地址
   baseURL: '',
 
@@ -51,7 +43,13 @@ const config: Config = {
 
 /**
  * 初始化配置
- * @param options - 配置选项
+ * @param {Object} options - 配置选项
+ * @param {string} [options.baseURL] - API 基础地址
+ * @param {Function} [options.hasPermission] - 权限检查函数 (permission: string) => boolean
+ * @param {Function} [options.uploadMethod] - 上传方法 (config: AxiosRequestConfig) => Promise
+ * @param {Object} [options.dialog] - Dialog 配置
+ * @param {boolean} [options.dialog.inheritTheme] - 是否继承外部定义的主题色（默认 true）
+ * @param {Object} [options.dialog.themeOverrides] - 主题色覆盖（当 inheritTheme 为 false 时使用）
  * @example
  * import { setupConfig } from '@xmszm/core'
  * 
@@ -70,7 +68,7 @@ const config: Config = {
  *   }
  * })
  */
-export function setupConfig(options: ConfigOptions = {}): Config {
+export function setupConfig(options: Partial<ConfigType> = {}) {
   if (options.baseURL !== undefined) {
     config.baseURL = options.baseURL
   }
@@ -109,66 +107,66 @@ export function setupConfig(options: ConfigOptions = {}): Config {
 
 /**
  * 获取配置
- * @returns 配置对象
+ * @returns {Object} 配置对象
  */
-export function getConfig(): Config {
+export function getConfig() {
   return { ...config }
 }
 
 /**
  * 获取 BASE_URL
- * @returns API 基础地址
+ * @returns {string}
  */
-export function getBaseURL(): string {
+export function getBaseURL() {
   return config.baseURL
 }
 
 /**
  * 获取权限检查函数
- * @returns 权限检查函数或 null
+ * @returns {Function|null}
  */
-export function getHasPermission(): ((permission: string) => boolean) | null {
+export function getHasPermission() {
   return config.hasPermission
 }
 
 /**
  * 获取上传方法
- * @returns 上传方法或 null
+ * @returns {Function|null}
  */
-export function getUploadMethod(): ((config: any) => Promise<any>) | null {
+export function getUploadMethod() {
   return config.uploadMethod
 }
 
 /**
  * 获取 Dialog 配置
- * @returns Dialog 配置对象
+ * @returns {Object}
  */
-export function getDialogConfig(): Config['dialog'] {
+export function getDialogConfig() {
   return { ...config.dialog }
 }
 
 /**
  * 注册 Dialog 实例（可选，如果不注册则内部自动获取）
- * @param dialogInstance - dialog 实例（从 useDialog 获取）
+ * @param {Object} dialogInstance - dialog 实例（从 useDialog 获取）
  */
-export function registerDialogInstance(dialogInstance: any): void {
+export function registerDialogInstance(dialogInstance) {
   config.dialog.instance = dialogInstance
 }
 
 /**
  * 获取 Dialog 实例
- * @returns Dialog 实例或 null
+ * @returns {Object|null}
  */
-export function getDialogInstance(): any {
+export function getDialogInstance() {
   return config.dialog.instance
 }
 
 /**
  * 检查权限（带默认值）
- * @param permission - 权限标识
- * @returns 是否拥有该权限
+ * @param {string} permission - 权限标识
+ * @returns {boolean}
  */
-export function checkPermission(permission: string): boolean {
+export function checkPermission(permission) {
   if (config.hasPermission) {
     return config.hasPermission(permission)
   }
@@ -191,3 +189,4 @@ export default {
   registerDialogInstance,
   getDialogInstance,
 }
+

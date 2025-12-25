@@ -1,26 +1,12 @@
 import { useRoute, useRouter } from 'vue-router'
 import { toArray } from './array'
 
-interface RouteMeta {
-  permission?: string | string[] | Record<string, any> | null
-  auth?: Record<string, any>
-  api?: Record<string, any>
-  [key: string]: any
-}
-
-interface Route {
-  name?: string | symbol
-  meta?: RouteMeta
-  children?: Route[]
-  [key: string]: any
-}
-
-export function cellectChildenPermission(o: Route): Route {
+export function cellectChildenPermission(o) {
   if (o?.children?.length) {
-    const pn: (string | null)[] = []
+    const pn = []
     o.children.forEach((v) => {
       cellectChildenPermission(v)
-      let arr: string[] | null = []
+      let arr = []
       if (typeof v?.meta?.permission === 'string')
         arr = [v.meta.permission]
       else if (Array.isArray(v.meta?.permission))
@@ -30,75 +16,80 @@ export function cellectChildenPermission(o: Route): Route {
       else if (!v?.meta?.permission)
         arr = null
       v.meta.permission = arr
-      if (arr) pn.push(...new Set(arr))
+      pn.push(...new Set(arr))
     })
     if (!o?.meta?.permission)
-      o.meta.permission = pn.filter((v): v is string => v !== null)
-    else o.meta.permission = [...new Set((o.meta.permission as string[]).concat(pn.filter((v): v is string => v !== null)))]
+      o.meta.permission = pn
+    else o.meta.permission = [...new Set(o.meta.permission.concat(pn))]
   }
 
   return o
 }
-
-export function mergaMethod(...arg: any[]): string[] {
+export function mergaMethod(...arg) {
   const arr = arg?.map(v => (Array.isArray(v) ? v : v?.ALL))
-  return [].concat(...arr).filter(Boolean)
+  return [].concat(...arr)
 }
 
-export function allMethod(data: any): string[] {
-  if (!data) return []
-  return Object.keys(data).reduce((a: string[], b: string) => {
+export function allMethod(data) {
+  if (!data)
+    return []
+  return Object.keys(data).reduce((a, b) => {
     if (typeof data[b] !== 'string') {
-      return a.concat(allMethod(data[b]))
-    } else {
+      a.concat(allMethod(data[b]))
+    }
+    else {
       a.push(data[b])
     }
     return a
   }, [])
 }
 
-export function useAuthPermission(...arg: any[]): Record<string, any> {
+export function useAuthPermission(...arg) {
   return {
     ...getRouteMeta('auth', arg),
   }
 }
 
-export function useApiConfig(...arg: any[]): Record<string, any> {
+export function useApiConfig(...arg) {
   return {
     ...getRouteMeta('api', arg),
   }
 }
 
 /**
- * 处理参数替换
- * @param str - 接口字符串
- * @param op - 接口参数替换对象
- * @returns 处理后的字符串
- * @example
+ *
+ * @param {*} str 接口字符串
+ * @param {*} op 接口参数替换
+ * @returns
  * return handleParams(data?.id ? updateTask : createTask, {
- *   '{processId}': unref(processId),
- *   '{id}': data?.id,
- * })[data?.id ? '$Put' : '$Post']({
- *   ...data,
- * })
+      '{processId}': unref(processId),
+      '{id}': data?.id,
+    })[data?.id ? '$Put' : '$Post']({
+      ...data,
+    }).then(() => {
+      reLoad()
+      $message.success(`${modeEnum[str]?.sub}成功`)
+      cancel()
+      if (isNext.value)
+        onAdd()
+    })
  */
-export function handleParams(str?: string, op: Record<string, any> = {}): string {
-  if (!str) return ''
-  let result = str
+
+export function handleParams(str, op = {}) {
   const arr = Object.keys(op)
   if (arr.length) {
     arr.forEach((v) => {
       const reg = new RegExp(`${v}`, 'g')
-      result = result?.replace(reg, op[v])
+      str = str?.replace(reg, op[v])
     })
   }
-  return result
+  return str
 }
 
-function getRouteMeta(name: 'auth' | 'api', arg: any[]): Record<string, any> {
+function getRouteMeta(name, arg) {
   const route = useRoute()
   const router = useRouter()
-  const meta = handleMeta((route?.meta?.[name] ?? {}) as Record<string, any>)
+  const meta = handleMeta(route?.meta?.[name] ?? {})
   const routeNameArr = toArray(arg[0])
 
   if (routeNameArr?.length) {
@@ -107,7 +98,7 @@ function getRouteMeta(name: 'auth' | 'api', arg: any[]): Record<string, any> {
       .filter(v => routeNameArr.includes(v.name))
     routeArr.forEach((v) => {
       if (v.meta?.[name])
-        meta[v.name as string] = handleMeta(v.meta[name] as Record<string, any>)
+        meta[v.name] = handleMeta(v.meta[name])
     })
   }
   return {
@@ -115,8 +106,8 @@ function getRouteMeta(name: 'auth' | 'api', arg: any[]): Record<string, any> {
   }
 }
 
-function handleMeta(o: Record<string, any> = {}): Record<string, any> {
-  return Object.keys(o).reduce((a: Record<string, any>, b: string) => {
+function handleMeta(o = {}) {
+  return Object.keys(o).reduce((a, b) => {
     const data = o[b]
     if (typeof data === 'object')
       a[b] = data?.key

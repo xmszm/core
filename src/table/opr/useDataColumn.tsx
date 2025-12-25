@@ -100,7 +100,7 @@ export function createActionColumnJsx(
                   },
                   i,
                 ) => {
-                  return isRender?.(row)
+                  return (typeof isRender === 'function' ? isRender(row) : isRender)
                     ? (
                       mode === 'pop'
                         ? (
@@ -113,8 +113,8 @@ export function createActionColumnJsx(
                           >
                             <NButton
                               text
-                              disabled={disabled && disabled(row)}
-                              type={disabled && disabled(row) ? 'default' : type}
+                              disabled={typeof disabled === 'function' ? disabled(row) : disabled}
+                              type={typeof disabled === 'function' && disabled(row) ? 'default' : type}
                               {...action}
                             >
                               {typeof action?.label === 'function'
@@ -205,12 +205,12 @@ export async function createQRCode(
       height: '350px',
     },
     content: () => (
-      <div className="qr-box">
+      <div class="qr-box">
         {loading.value ? <NSpin class="qr-spin" show /> : ''}
-        <div className="qr-img">
+        <div class="qr-img">
           <NImage src={code.value} style={{ width: '100%' }} />
         </div>
-        <div className="qr-title">{loading.value ? '' : row.name}</div>
+        <div class="qr-title">{loading.value ? '' : row.name}</div>
       </div>
     ),
   }, dialogInstance)

@@ -96,10 +96,11 @@ const defaultOptions: Record<string, OptionFunction> = {
   ): VNode => {
     const value = unref(_value)
     const isRead = unref(_isRead)
-    const fnOptions
-      = (Array.isArray(unref(options))
-        ? unref(options)
-        : options?.(value[key as string])) || []
+    const fnOptions = Array.isArray(options)
+      ? options
+      : typeof options === 'function'
+        ? options(value[key as string])
+        : []
     return (read ?? isRead)
       ? (
           <div>
@@ -109,7 +110,7 @@ const defaultOptions: Record<string, OptionFunction> = {
                 fnOptions,
                 props?.labelField || globalLabelField,
                 props?.valueField || globalValueField,
-              )?.[value[key as string]]?.[props?.labelField || globalLabelField]}
+              )?.[value[key as string]]?.[props?.labelField || globalLabelField] || value[key as string]}
           </div>
         )
       : (
@@ -163,7 +164,7 @@ const defaultOptions: Record<string, OptionFunction> = {
             onUpdate:formatted-value={(v: string) => {
               value[key as string] = v
             }}
-            type={type}
+            type={type as any}
             clearable
             placeholder={`请选择${unref(label)}`}
             update-value-on-close={!['year']?.includes(props?.type)}
@@ -266,7 +267,7 @@ const defaultOptions: Record<string, OptionFunction> = {
               }
             }}
             update-value-on-close={!['year', 'month']?.includes(props?.type)}
-            type={type}
+            type={type as any}
             clearable
             style="width:100%"
             {...props}
@@ -288,7 +289,7 @@ const defaultOptions: Record<string, OptionFunction> = {
           <div>
             {
               ArrayToObject(
-                options,
+                Array.isArray(options) ? options : [],
                 props?.labelField || labelField || globalLabelField,
                 props?.valueField || valueField || globalValueField,
               )?.[value[key as string]]?.[props?.labelField || labelField || globalLabelField]
@@ -305,7 +306,7 @@ const defaultOptions: Record<string, OptionFunction> = {
               ...(props?.slots || {}),
               default: () => (
                 <NSpace item-wrap={false} {...(props?.radioProps || {})}>
-                  {options?.map((v: any) => (
+                  {(Array.isArray(options) ? options : [])?.map((v: any) => (
                     <NRadio
                       key={v.value}
                       value={v?.[props?.valueField || valueField || globalValueField]}
@@ -403,17 +404,22 @@ const defaultOptions: Record<string, OptionFunction> = {
     console.log(loading)
     console.log(pageState)
 
+    const tableData = pageState?.data?.length ? pageState.data : value[key as string]
+    const tableColumns = Array.isArray(options) ? options : typeof options === 'function' ? options(value[key as string]) : []
+
+    const dataTableProps = {
+      data: tableData as any[],
+      columns: tableColumns as import('../../types/components').TableColumn[],
+      maxHeight: 200,
+      minHeight: 200,
+      isEllipsis: false,
+      oprColumns: opr as import('../../types/components').TableColumn | null,
+      loading: pageState?.loading as boolean,
+      ...props
+    } as import('../../types/components').DataTableProps & Record<string, any>
+
     return (
-      <DataTable
-        data={pageState?.data?.length ? pageState.data : value[key as string]}
-        columns={unref(options)}
-        maxHeight={200}
-        minHeight={200}
-        is-ellipsis={false}
-        opr-columns={opr}
-        loading={pageState?.loading}
-        {...props}
-      />
+      <DataTable {...dataTableProps} />
     )
   },
   progress: ({ key, props }: OptionParams, { _value }: OptionContext): VNode => {
@@ -473,7 +479,7 @@ const defaultOptions: Record<string, OptionFunction> = {
     return (read ?? isRead)
       ? (
           <div>
-            {unref(options)
+            {(Array.isArray(options) ? options : [])
               ?.filter((v: any) =>
                 value[key as string]?.includes(
                   v[props?.valueField || valueField || globalValueField],
@@ -493,7 +499,7 @@ const defaultOptions: Record<string, OptionFunction> = {
               ...(props?.slots || {}),
               default: () => (
                 <NSpace {...(props?.checkBoxProps || {})}>
-                  {unref(options)?.map((v: any) => (
+                  {(Array.isArray(options) ? options : [])?.map((v: any) => (
                     <NCheckbox
                       key={v?.[props?.valueField || valueField || globalValueField]}
                       value={

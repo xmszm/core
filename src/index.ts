@@ -30,30 +30,17 @@ export { ObjectToArray } from './utils/object'
 
 export { ArrayToObject } from './utils/array'
 
+
+
 export { customUpload, registryUpload, getFileUrl } from './utils/upload'
-export {
-  setupConfig,
-  getConfig,
-  getBaseURL,
-  getHasPermission,
-  getUploadMethod,
-  checkPermission,
-  getDialogConfig,
-  registerDialogInstance,
-  getDialogInstance,
-} from './utils/config'
-export {
-  createDialog,
-  createDialogMethods,
-  createDialogOptions,
-} from './utils/dialog'
+export { setupConfig, getConfig, getBaseURL, getHasPermission, getUploadMethod, checkPermission, getDialogConfig, registerDialogInstance, getDialogInstance } from './utils/config'
+export { createDialog, createDialogMethods, createDialogOptions } from './utils/dialog'
 
 export { default as DataTable } from './table/DataTable.vue'
 
-export {
-  labelField as globalLabelField,
-  valueField as globalValueField,
-} from './enum/options'
+
+export { labelField as globalLabelField, valueField as globalValueField } from './enum/options'
+
 
 export { initRules } from './dialog/utils/dialog'
 
@@ -68,8 +55,4 @@ import CorePluginDefault from './plugin/index'
 export { CorePluginDefault as CorePlugin }
 export { install } from './plugin/index'
 export { permissionDirective } from './directives/permission'
-export {
-  registerDirectives,
-  autoRegisterDirectives,
-  getGlobalApp,
-} from './directives/auto-register'
+export { registerDirectives, autoRegisterDirectives, getGlobalApp } from './directives/auto-register'

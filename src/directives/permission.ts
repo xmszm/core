@@ -1,4 +1,3 @@
-import type { DirectiveBinding } from 'vue'
 import { checkPermission } from '../utils/config'
 
 /**
@@ -10,7 +9,7 @@ import { checkPermission } from '../utils/config'
  * <div v-corePermission="['user:edit', 'user:view']">需要编辑或查看权限</div>
  */
 export const permissionDirective = {
-  mounted(el: HTMLElement, binding: DirectiveBinding<string | string[]>) {
+  mounted(el, binding) {
     const permission = binding.value
 
     if (!permission) {
@@ -28,17 +27,17 @@ export const permissionDirective = {
       // 没有权限时隐藏元素
       el.style.display = 'none'
       // 保存原始 display 值，以便后续恢复
-      ;(el as any)._originalDisplay = el.style.display || ''
+      el._originalDisplay = el.style.display || ''
     }
   },
 
-  updated(el: HTMLElement, binding: DirectiveBinding<string | string[]>) {
+  updated(el, binding) {
     const permission = binding.value
 
     if (!permission) {
       // 恢复显示
-      if ((el as any)._originalDisplay !== undefined) {
-        el.style.display = (el as any)._originalDisplay || ''
+      if (el._originalDisplay !== undefined) {
+        el.style.display = el._originalDisplay || ''
       } else {
         el.style.display = ''
       }
@@ -52,16 +51,17 @@ export const permissionDirective = {
       el.style.display = 'none'
     } else {
       // 恢复显示
-      if ((el as any)._originalDisplay !== undefined) {
-        el.style.display = (el as any)._originalDisplay || ''
+      if (el._originalDisplay !== undefined) {
+        el.style.display = el._originalDisplay || ''
       } else {
         el.style.display = ''
       }
     }
   },
 
-  unmounted(el: HTMLElement) {
+  unmounted(el) {
     // 清理
-    delete (el as any)._originalDisplay
+    delete el._originalDisplay
   },
 }
+

@@ -38,20 +38,21 @@ export default defineComponent(
             },
             i,
           ) => {
-            return isRender?.(props.data)
+            return (typeof isRender === 'function' ? isRender(props.data) : isRender)
               ? (
                   mode === 'pop'
                     ? (
                         <Pop
                           onClick={onClick}
                           row={props.data}
+                          index={props.index}
                           action={action}
                           key={rowIndexKey(props.data, props.index) + i}
                         >
                           <NButton
                             text
-                            disabled={disabled && disabled(props.data)}
-                            type={disabled && disabled(props.data) ? 'default' : type}
+                            disabled={typeof disabled === 'function' ? disabled(props.data) : disabled}
+                            type={typeof disabled === 'function' && disabled(props.data) ? 'default' : type}
                             {...action}
                           >
                             {typeof action?.label === 'function'

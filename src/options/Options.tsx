@@ -214,8 +214,8 @@ export default defineComponent(
       item.formItemProps = initProps(item?.formItemProps)
       if (!item.formItemProps)
         item.formItemProps = {}
-      if (!item?.formItemProps?.labelWidth && props.formProps?.labelWidth) {
-        item.formItemProps.labelWidth = props.formProps?.labelWidth
+      if (!(item.formItemProps as any)?.labelWidth && (props.formProps as any)?.labelWidth) {
+        (item.formItemProps as any).labelWidth = (props.formProps as any)?.labelWidth
       }
 
       return (
@@ -224,13 +224,13 @@ export default defineComponent(
           key={index}
           showLabel={!item?.noLabel}
           {...item?.formItemProps}
-          labelWidth={item?.formItemProps?.labelWidth || 'auto'}
-          feedback={initProps(item?.formItemProps?.feedback, 'string')}
+          labelWidth={(item?.formItemProps as any)?.labelWidth || 'auto'}
+          feedback={initProps((item?.formItemProps as any)?.feedback, 'string')}
           style={{
             padding: '0 15px',
             boxSizing: 'border-box',
             width: '100%',
-            ...(item?.formItemProps?.style || {}),
+            ...((item?.formItemProps as any)?.style || {}),
           }}
           path={String(item.key)}
         >

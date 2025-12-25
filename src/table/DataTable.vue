@@ -11,7 +11,7 @@ import { useRoute } from 'vue-router'
 import FilterDialog from './FilterDialog.vue'
 import { orderEnum } from 'core'
 import { registerDirectives } from '../directives/auto-register'
-
+import {NDataTable} from 'naive-ui'
 // 自动注册指令
 const instance = getCurrentInstance()
 if (instance?.appContext?.app) {
@@ -264,7 +264,7 @@ onMounted(() => {})
 </script>
 
 <template>
-  <n-data-table
+  <NDataTable
     :data="_data"
     :columns="_columns"
     :scroll-x="scrollX"
@@ -275,7 +275,7 @@ onMounted(() => {})
     :row-props="() => ({ style: { height: '60px' } })"
     flex-height
     remote
-    :virtual-scroll="props.virtual ?? props.data.length > 1000"
+    :virtual-scroll="!!(props.virtual ?? props.data.length > 1000)"
     style="flex: 1"
     @update:sorter="onSorter"
   >
@@ -285,7 +285,7 @@ onMounted(() => {})
         <n-empty>{{ emptyText }}</n-empty>
       </slot>
     </template>
-  </n-data-table>
+  </NDataTable>
 </template>
 
 <style scoped lang="less">

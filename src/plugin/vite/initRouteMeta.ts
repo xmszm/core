@@ -1,30 +1,8 @@
-interface RouteMeta {
-  title?: string
-  api?: Record<string, any>
-  auth?: Record<string, any> | Record<string, boolean>
-  permission?: string | string[]
-  hidden?: boolean
-  [key: string]: any
-}
-
-interface Route {
-  path?: string
-  title?: string
-  meta?: RouteMeta
-  children?: Route[]
-  api?: Record<string, any>
-  auth?: Record<string, any> | Record<string, boolean>
-  permission?: string | string[]
-  hidden?: boolean
-  sourceFullPath?: string
-  [key: string]: any
-}
-
-export function initRouteMeta(routes: Route[], str: string = ''): Route[] {
+export function initRouteMeta(routes, str = '') {
   if (routes.length) {
     routes.forEach((v) => {
       if (v.children) {
-        initRouteMeta(v.children, v?.path || '')
+        initRouteMeta(v.children, v?.path)
       }
       if (v.path)
         v.sourceFullPath = `${str ? `${str}/`.replace(/^\/\//, '/') : ''}${v.path}`
@@ -44,14 +22,14 @@ export function initRouteMeta(routes: Route[], str: string = ''): Route[] {
       if (v?.hidden)
         v.meta.hidden = v.hidden
 
-      let authPermission: string[] = []
+      let authPermission = []
       if (v?.auth) {
         v.meta.auth = v.auth
 
-        authPermission = Object.keys(v.auth).reduce((a: string[], b: string) => {
-          if (typeof v.auth![b] === 'string')
-            a.push(v.auth![b] as string)
-          else if (typeof v.auth![b] === 'boolean')
+        authPermission = Object.keys(v.auth).reduce((a, b) => {
+          if (typeof v.auth[b] === 'string')
+            a.push(v.auth[b])
+          else if (typeof v.auth[b] === 'boolean')
             a.push(b)
           return a
         }, [])

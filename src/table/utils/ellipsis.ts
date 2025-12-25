@@ -19,4 +19,4 @@ export const ellipsis = {
       backgroundColor: '--n-color',
     },
   },
-} as const
+}
