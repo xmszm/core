@@ -1,156 +1,167 @@
 <script setup lang="tsx">
-import { RefreshOutline, SearchOutline } from '@vicons/ionicons5'
-import type { CommonQueryProps, CommonQueryEmits, FormOption } from '../../types/components'
-import DataForm from '../form/DataForm.vue'
-import { getOptions } from '../options/defaultOptions'
-import { ObjectToArray } from '../utils/object'
-import { computed, onMounted, onUnmounted, ref, getCurrentInstance } from 'vue'
-import { NButton, NSpace } from 'naive-ui'
-import { registerDirectives } from '../directives/auto-register'
+import { RefreshOutline, SearchOutline } from "@vicons/ionicons5";
+import type {
+  CommonQueryProps,
+  CommonQueryEmits,
+  FormOption,
+} from "../../types/components";
+import DataForm from "../form/DataForm.vue";
+import { getOptions } from "../options/defaultOptions";
+import { ObjectToArray } from "../utils/object";
+import { computed, onMounted, onUnmounted, ref, getCurrentInstance } from "vue";
+import { NButton, NSpace } from "naive-ui";
+import { registerDirectives } from "../directives/auto-register";
 
 // 自动注册指令
-const instance = getCurrentInstance()
+const instance = getCurrentInstance();
 if (instance?.appContext?.app) {
-  registerDirectives(instance.appContext.app)
+  registerDirectives(instance.appContext.app);
 }
 
 // 防抖函数
-function debounce<T extends (...args: any[]) => any>(func: T, delay: number): (...args: Parameters<T>) => void {
-  let timeoutId: ReturnType<typeof setTimeout> | undefined
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
   return function (...args: Parameters<T>) {
-    clearTimeout(timeoutId)
+    clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
-      func.apply(this, args)
-    }, delay)
-  }
+      func.apply(this, args);
+    }, delay);
+  };
 }
-const emit = defineEmits<CommonQueryEmits>()
+const emit = defineEmits<CommonQueryEmits>();
 
 const props = withDefaults(defineProps<CommonQueryProps>(), {
   inlineText: true,
   options: () => [],
   query: () => ({}),
   selectCount: 1,
-  type: 'primary',
+  type: "primary",
   noButton: false,
   isRead: false,
-  btn: () => ['reset', 'search'],
-  size: 'medium',
-})
+  btn: () => ["reset", "search"],
+  size: "medium",
+});
 
 function onBeforeOptions(arr: FormOption[]): FormOption[] {
   return arr.map((v: FormOption) => ({
     ...v,
     props: {
       ...v.props,
-      ...((!v.way || v.way === 'input') ? {
-        onUpdateValue: (...args: any[]) => {
-          ;(v.props as any)?.onUpdateValue?.(...args)
-        debouncedSubmit()
-      }
-      } : {}),
-    ...(v?.way === 'select' ? {
-        onUpdateValue: (...args: any[]) => {
-          ;(v.props as any)?.onUpdateValue?.(...args)
-        debouncedSubmit()
-      }
-      } : {})
-  }
-  }))
+      ...(!v.way || v.way === "input"
+        ? {
+            onUpdateValue: (...args: any[]) => {
+              (v.props as any)?.onUpdateValue?.(...args);
+              debouncedSubmit();
+            },
+          }
+        : {}),
+      ...(v?.way === "select"
+        ? {
+            onUpdateValue: (...args: any[]) => {
+              (v.props as any)?.onUpdateValue?.(...args);
+              debouncedSubmit();
+            },
+          }
+        : {}),
+    },
+  }));
 }
 
 // 创建防抖的提交函数（500ms延迟）
 const debouncedSubmit = debounce(() => {
-  emit('submit')
-}, 500)
+  emit("submit");
+}, 500);
 
 function onSubmit() {
   // loading.value = true
-  debouncedSubmit()
+  debouncedSubmit();
   // loading.value = false
   // return false
 }
-const loading = ref(false)
-const _query = defineModel('query', {
+const loading = ref(false);
+const _query = defineModel("query", {
   type: Object,
   default: () => ({}),
-})
+});
 
 const defaultFormItemProps = {
   style: {
-    width: '33%',
+    width: "33%",
   },
-}
+};
 const _queryOptionsKey = computed(() =>
-  props.options?.map(v => v?.way || 'input'),
-)
-const defaultOptions = getOptions(_queryOptionsKey.value)
+  props.options?.map((v) => v?.way || "input")
+);
+const defaultOptions = getOptions(_queryOptionsKey.value);
 
 const _queryOptions = computed(() => {
   try {
-    const arr: FormOption[] = []
+    const arr: FormOption[] = [];
     for (let i = 0; i < (props.options?.length || 0); i++) {
-      const v = props.options![i]
-      if (v?.enum && !v?.options)
-        v.options = ObjectToArray(v.enum)
+      const v = props.options![i];
+      if (v?.enum && !v?.options) v.options = ObjectToArray(v.enum);
       if (!v?.props) {
         v.props = {
           size: props.size,
-        }
+        };
       }
 
       if (!v?.formItemProps) {
-        v.formItemProps = { ...defaultFormItemProps }
-      }
-      else {
-        const formItemProps = typeof v.formItemProps === 'function'
-          ? v.formItemProps({}, {})
-          : v.formItemProps
+        v.formItemProps = { ...defaultFormItemProps };
+      } else {
+        const formItemProps =
+          typeof v.formItemProps === "function"
+            ? v.formItemProps({}, {})
+            : v.formItemProps;
         v.formItemProps = {
           ...defaultFormItemProps,
           ...formItemProps,
-          style: { ...defaultFormItemProps.style, ...(formItemProps as any)?.style },
-        }
+          style: {
+            ...defaultFormItemProps.style,
+            ...(formItemProps as any)?.style,
+          },
+        };
       }
 
-      const key = v?.key || (v as any)?.value
-      if (!key)
-        throw new Error('key no set')
+      const key = v?.key || (v as any)?.value;
+      if (!key) throw new Error("key no set");
       arr.push({
         ...v,
         key,
-      })
+      });
     }
-    return onBeforeOptions(arr)
+    return onBeforeOptions(arr);
+  } catch (e) {
+    console.warn("error", e);
+    return [];
   }
-  catch (e) {
-    console.warn('error', e)
-    return []
-  }
-})
+});
 
 const classComponent = {
-  input: '',
-  select: '',
-  dateRange: 'input-range',
-  dateRangeTime: 'input-range-time',
-}
+  input: "",
+  select: "",
+  dateRange: "input-range",
+  dateRangeTime: "input-range-time",
+};
 const defaultBtnProps = {
   style: {
-    borderRadius: '3px',
+    borderRadius: "3px",
   },
-}
+};
 const defaultBtn = {
   search: () => (
     <NButton
       type={props.type}
       loading={loading.value}
-      default-props={{ attrType: 'submit' }}
+      default-props={{ attrType: "submit" }}
       onClick={() => onSubmit()}
       {...defaultBtnProps}
     >
       {{
-        default: () => '搜索',
+        default: () => "搜索",
         icon: () => <SearchOutline />,
       }}
     </NButton>
@@ -159,53 +170,52 @@ const defaultBtn = {
     <NButton
       type="default"
       onClick={() => {
-        clearQuery()
+        clearQuery();
       }}
       {...defaultBtnProps}
     >
       {{
-        default: () => '重置',
+        default: () => "重置",
         icon: () => <RefreshOutline />,
       }}
     </NButton>
   ),
-}
+};
 
 function clearQuery(): void {
   props.options?.forEach((v: FormOption) => {
-    const key = (v?.key as string) || (v as any)?.value
+    const key = (v?.key as string) || (v as any)?.value;
     if (key) {
       if (v?.queryType) {
         if (!(_query.value as any)[v.queryType]) {
-          (_query.value as any)[v.queryType] = {}
+          (_query.value as any)[v.queryType] = {};
         }
-        (_query.value as any)[v.queryType][key] = null
-      }
-      else {
-        (_query.value as any)[key] = null
+        (_query.value as any)[v.queryType][key] = null;
+      } else {
+        (_query.value as any)[key] = null;
       }
     }
-  })
-  emit('reset')
+  });
+  emit("reset");
 }
 
 // 全局监听 Enter 键的方法
 function handleGlobalEnter(event: KeyboardEvent): void {
   // 检查是否按下了 Enter 键
-  if (event.key === 'Enter') {
-    onSubmit()
+  if (event.key === "Enter") {
+    onSubmit();
   }
 }
 
 // 组件挂载时添加全局监听
 onMounted(() => {
-  document.addEventListener('keydown', handleGlobalEnter)
-})
+  document.addEventListener("keydown", handleGlobalEnter);
+});
 
 // 组件卸载时移除全局监听
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleGlobalEnter)
-})
+  document.removeEventListener("keydown", handleGlobalEnter);
+});
 </script>
 
 <template>
@@ -233,6 +243,9 @@ onUnmounted(() => {
 </template>
 
 <style scoped lang="less">
+.flex-1 {
+  flex: 1;
+}
 .select-text {
   min-width: 100px;
   max-width: 240px;

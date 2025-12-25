@@ -6,6 +6,7 @@ export {
   getAllOptions,
   getOptions,
   setupOptions,
+  default as setupInitOptions
 } from './options/defaultOptions'
 export { default as Options } from './options/Options'
 export { default as CommonQuery } from './query/CommonQuery.vue'
