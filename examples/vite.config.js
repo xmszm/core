@@ -19,12 +19,19 @@ const redirectExternalImports = () => {
 }
 
 export default defineConfig({
+  base: '/core/examples/',
   plugins: [vue(), vueJsx(), redirectExternalImports()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
+      '@xmszm/core': path.resolve(__dirname, '..'),
+      '@xmszm/core/dist/style.css': path.resolve(__dirname, '../dist/style.css'),
     },
     dedupe: ['vue'],
+  },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
   },
   server: {
     port: 3000,

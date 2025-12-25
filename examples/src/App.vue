@@ -1,5 +1,5 @@
 <script setup lang="jsx">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { NButton, NCard, NSpace, NLayout, NLayoutHeader, NLayoutContent } from 'naive-ui'
 import {
   commonDialogMethod,
@@ -9,11 +9,12 @@ import {
 } from '@xmszm/core'
 import '@xmszm/core/dist/style.css'
 import Introduction from './Introduction.vue'
+import AdminSystem from './AdminSystem.vue'
 
 // 从 localStorage 读取保存的视图，如果没有则默认为 'introduction'
 const getInitialView = () => {
   const saved = localStorage.getItem('core-app-view')
-  return saved === 'demo' ? 'demo' : 'introduction'
+  return saved || 'introduction'
 }
 
 const currentView = ref(getInitialView())
@@ -149,20 +150,43 @@ function onExport() {
   setTimeout(() => (exportLoading.value = false), 800)
 }
 
+// 监听自定义事件，实现跨组件通信
+const handleViewChange = (e) => {
+  if (e.detail && e.detail.view) {
+    switchView(e.detail.view)
+  }
+}
+
 onMounted(() => {
   // 如果当前视图是 demo，则加载数据
   if (currentView.value === 'demo') {
     pageState.fetchData()
   }
+  // 监听自定义视图切换事件
+  window.addEventListener('view-change', handleViewChange)
+})
+
+// 清理事件监听
+onUnmounted(() => {
+  window.removeEventListener('view-change', handleViewChange)
 })
 </script>
 
 <template>
-  <n-layout class="app-layout">
+  <AdminSystem v-if="currentView === 'admin'" />
+  <n-layout v-else class="app-layout">
     <n-layout-header class="app-header" bordered>
       <div class="header-content">
         <h2 class="app-title">@xmszm/core 组件库</h2>
         <n-space>
+          <n-button
+            type="default"
+            tag="a"
+            href="/core/"
+            target="_self"
+          >
+            返回文档
+          </n-button>
           <n-button
             :type="currentView === 'introduction' ? 'primary' : 'default'"
             @click="switchView('introduction')"
@@ -174,6 +198,12 @@ onMounted(() => {
             @click="switchView('demo')"
           >
             组件示例
+          </n-button>
+          <n-button
+            :type="currentView === 'admin' ? 'primary' : 'default'"
+            @click="switchView('admin')"
+          >
+            管理后台
           </n-button>
         </n-space>
       </div>

@@ -18,6 +18,7 @@ export default defineConfig({
       { text: '工具', link: '/components/utils' },
       { text: '版本历史', link: '/guide/changelog' },
       { text: '示例 Demo', link: '/guide/demo' },
+      { text: '在线示例', link: '/examples/', target: '_self' },
     ],
     sidebar: {
       '/guide/': [

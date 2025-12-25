@@ -7,6 +7,7 @@ on:
       - master
     paths:
       - 'docs/**'
+      - 'examples/**'
       - '.github/workflows/docs.yml'
   workflow_dispatch:
 
@@ -34,8 +35,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       
+      - name: Build core library
+        run: pnpm run build
+      
       - name: Build docs
         run: pnpm run docs:build
+      
+      - name: Build examples
+        working-directory: examples
+        run: pnpm run build
+      
+      - name: Copy examples to docs dist
+        run: |
+          mkdir -p docs/.vitepress/dist/examples
+          cp -r examples/dist/* docs/.vitepress/dist/examples/
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
