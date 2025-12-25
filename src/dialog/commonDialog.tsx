@@ -253,7 +253,8 @@ export function commonDialogMethod(
           formRef.value = v
         }}
         options={options}
-        v-model:value={model}
+        value={unref(model)}
+        onUpdate:value={v=>model.value = v}
         isNo={isNo}
         read={read ?? isRead}
         labelField={labelField}
