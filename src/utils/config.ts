@@ -14,6 +14,7 @@ interface ConfigType {
     instance: any
     inheritTheme: boolean
     themeOverrides: any
+    defaultOption: any
   }
 }
 
@@ -38,6 +39,8 @@ const config: ConfigType = {
     inheritTheme: true,
     // 主题色覆盖（当 inheritTheme 为 false 时使用）
     themeOverrides: null,
+    // Dialog 默认配置项
+    defaultOption: null,
   },
 }
 
@@ -50,9 +53,10 @@ const config: ConfigType = {
  * @param {Object} [options.dialog] - Dialog 配置
  * @param {boolean} [options.dialog.inheritTheme] - 是否继承外部定义的主题色（默认 true）
  * @param {Object} [options.dialog.themeOverrides] - 主题色覆盖（当 inheritTheme 为 false 时使用）
+ * @param {Object} [options.dialog.defaultOption] - commonDialogMethod 的默认选项配置
  * @example
  * import { setupConfig } from '@xmszm/core'
- * 
+ *
  * setupConfig({
  *   baseURL: 'https://api.example.com',
  *   hasPermission: (permission) => {
@@ -64,6 +68,13 @@ const config: ConfigType = {
  *     inheritTheme: false, // 不继承外部主题色
  *     themeOverrides: {
  *       // 自定义主题色
+ *     },
+ *     defaultOption: {
+ *       // commonDialogMethod 的默认配置
+ *       showIcon: false,
+ *       autoFocus: false,
+ *       closable: true,
+ *       closeOnEsc: true,
  *     }
  *   }
  * })
@@ -99,6 +110,9 @@ export function setupConfig(options: Partial<ConfigType> = {}) {
     }
     if (options.dialog.themeOverrides !== undefined) {
       config.dialog.themeOverrides = options.dialog.themeOverrides
+    }
+    if (options.dialog.defaultOption !== undefined) {
+      config.dialog.defaultOption = options.dialog.defaultOption
     }
   }
 

@@ -334,6 +334,19 @@ export interface CoreConfig {
     inheritTheme?: boolean
     /** 主题色覆盖 */
     themeOverrides?: any
+    /** commonDialogMethod 的默认选项配置 */
+    defaultOption?: {
+      /** 是否显示图标 */
+      showIcon?: boolean
+      /** 是否自动聚焦 */
+      autoFocus?: boolean
+      /** 是否可关闭 */
+      closable?: boolean
+      /** 是否按 ESC 关闭 */
+      closeOnEsc?: boolean
+      /** 其他 NDialog 支持的属性 */
+      [key: string]: any
+    }
   }
 }
 

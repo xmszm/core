@@ -6,6 +6,7 @@ import type { CommonDialogOptions, DialogAction } from '../../types/components'
 import type { CommonDialogResult } from '../../types'
 import DataForm from '../form/DataForm.vue'
 import { dialogDefaultOption } from './utils/dialog'
+import { getDialogConfig } from '../utils/config'
 import './style/commonDialog.less'
 
 // 声明全局 $dialog 变量（外部可能注入）
@@ -238,9 +239,13 @@ export function commonDialogMethod(
         )
     : null
 
+  // 获取配置系统中的默认选项，优先使用配置系统的配置
+  const configDefaultOption = getDialogConfig()?.defaultOption || {}
+  const mergedDefaultOption = { ...dialogDefaultOption, ...configDefaultOption }
+
   const d = dialogInstance.create({
     type: 'info',
-    ...dialogDefaultOption,
+    ...mergedDefaultOption,
     ...(!noTitle
       ? { title: titleRender || (defaultModeEnum[mode]?.sub ?? '') + title }
       : {}),
