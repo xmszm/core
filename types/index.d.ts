@@ -161,34 +161,334 @@ export function initRules(args: {
   formOpr?: Record<string, any>
 }): any
 
-export function getAllOptions(...args: any[]): any
-export function getOptions(...args: any[]): any
-export function setupOptions(...args: any[]): any
+/**
+ * 选项函数类型
+ */
+export type OptionFunction = (value: any, key: string, formOpr?: any) => FormOption
 
+/**
+ * 初始化默认选项类型（自动注册所有内置选项类型）
+ */
+export function setupInitOptions(): void
+export default setupInitOptions
+
+/**
+ * 获取所有已注册的选项类型
+ * @returns 所有选项类型的Map对象
+ */
+export function getAllOptions(): Map<string, OptionFunction>
+
+/**
+ * 获取指定类型的选项配置函数
+ * @param way - 选项类型标识
+ * @returns 选项配置函数
+ */
+export function getOptions(way: string): OptionFunction | undefined
+
+/**
+ * 注册自定义选项类型
+ * @param way - 选项类型标识
+ * @param fn - 选项配置函数
+ * @example
+ * ```typescript
+ * setupOptions('customInput', (value, key) => ({
+ *   key,
+ *   way: 'input',
+ *   props: { placeholder: '自定义输入框' }
+ * }))
+ * ```
+ */
+export function setupOptions(way: string, fn: OptionFunction): void
+
+/**
+ * 将值转换为数组
+ * @param v - 单个值或数组
+ * @returns 数组
+ */
 export function toArray<T = any>(v: T | T[]): T[]
+
+/**
+ * 将数组转换为对象
+ * @param arr - 数组
+ * @param fields - 字段映射配置
+ * @returns 以valueField为key的对象
+ */
 export function ArrayToObject<T = any>(
   arr?: T[],
   fields?: { labelField?: string; valueField?: string },
 ): Record<string, T>
+
+/**
+ * 将对象转换为数组
+ * @param obj - 对象
+ * @param fields - 字段映射配置
+ * @returns 数组，每项包含labelField和valueField
+ */
 export function ObjectToArray<T extends Record<string, any> = any>(
   obj?: T,
   fields?: { labelField?: string; valueField?: string },
-): any[]
+): Array<{ [K in keyof typeof fields]: any }>
 
-export function customUpload(...args: any[]): Promise<any>
-export function registryUpload(fn: (...args: any[]) => Promise<any>): void
+/**
+ * 自定义上传函数（需先通过 registryUpload 注册）
+ * @param config - 上传配置对象
+ * @returns Promise 返回上传结果
+ */
+export function customUpload(config: any): Promise<any>
+
+/**
+ * 注册全局上传方法
+ * @param fn - 上传函数
+ */
+export function registryUpload(fn: (config: any) => Promise<any>): void
+
+/**
+ * 获取文件URL（支持OSS尺寸参数）
+ * @param url - 文件URL
+ * @param ossSize - OSS图片尺寸参数
+ * @returns 处理后的URL
+ */
 export function getFileUrl(url?: string, ossSize?: number | null): string | undefined
 
-export function cellectChildenPermission(route: any): any
+/**
+ * 收集子路由的权限
+ * @param route - 路由对象
+ * @returns 权限数组
+ */
+export function cellectChildenPermission(route: any): string[]
+
+/**
+ * 处理URL参数字符串
+ * @param str - 参数模板字符串
+ * @param op - 参数对象
+ * @returns 处理后的字符串
+ */
 export function handleParams(str?: string, op?: Record<string, any>): string
-export function useApiConfig(...args: any[]): Record<string, any>
-export function useAuthPermission(...args: any[]): Record<string, any>
+
+/**
+ * 获取API配置对象
+ * @returns API配置对象
+ */
+export function useApiConfig(): { baseURL: string }
+
+/**
+ * 获取权限检查函数
+ * @returns 权限相关方法
+ */
+export function useAuthPermission(): {
+  hasPermission: (permission: string) => boolean
+  checkPermission: (permission: string) => boolean
+}
+
+/**
+ * 初始化路由元信息
+ * @param routes - 路由配置数组
+ * @param base - 基础路径
+ * @returns 处理后的路由配置
+ */
 export function initRouteMeta(routes: any[], base?: string): any[]
 
-export const ellipsis: any
-export const orderEnum: Record<string, any>
+/**
+ * 表格单元格省略配置
+ */
+export const ellipsis: {
+  tooltip: boolean
+  lineClamp?: number
+}
+
+/**
+ * 排序枚举
+ */
+export const orderEnum: {
+  ascend: string
+  descend: string
+}
+
+/**
+ * 全局标签字段名
+ */
 export const globalLabelField: string
+
+/**
+ * 全局值字段名
+ */
 export const globalValueField: string
+
+// ==================== 配置系统 ====================
+
+/**
+ * 全局配置对象类型
+ */
+export interface CoreConfig {
+  /** API 基础地址 */
+  baseURL?: string
+  /** 权限检查函数 */
+  hasPermission?: (permission: string) => boolean
+  /** 上传方法 */
+  uploadMethod?: (config: any) => Promise<any>
+  /** Dialog 配置 */
+  dialog?: {
+    /** Dialog 实例 */
+    instance?: any
+    /** 是否继承外部定义的主题色 */
+    inheritTheme?: boolean
+    /** 主题色覆盖 */
+    themeOverrides?: any
+  }
+}
+
+/**
+ * 初始化全局配置
+ * @param options - 配置选项
+ */
+export function setupConfig(options: CoreConfig): void
+
+/**
+ * 获取完整配置对象
+ * @returns 配置对象
+ */
+export function getConfig(): Required<CoreConfig>
+
+/**
+ * 获取API基础地址
+ * @returns 基础地址
+ */
+export function getBaseURL(): string
+
+/**
+ * 获取权限检查函数
+ * @returns 权限检查函数
+ */
+export function getHasPermission(): ((permission: string) => boolean) | null
+
+/**
+ * 获取上传方法
+ * @returns 上传方法
+ */
+export function getUploadMethod(): ((config: any) => Promise<any>) | null
+
+/**
+ * 检查权限
+ * @param permission - 权限标识
+ * @returns 是否有权限
+ */
+export function checkPermission(permission: string): boolean
+
+/**
+ * 获取Dialog配置
+ * @returns Dialog配置对象
+ */
+export function getDialogConfig(): CoreConfig['dialog']
+
+/**
+ * 注册Dialog实例
+ * @param instance - Dialog实例
+ */
+export function registerDialogInstance(instance: any): void
+
+/**
+ * 获取Dialog实例
+ * @returns Dialog实例
+ */
+export function getDialogInstance(): any | null
+
+// ==================== Dialog工具 ====================
+
+/**
+ * 创建Dialog实例
+ * @returns Dialog API对象
+ */
+export function createDialog(): any
+
+/**
+ * 创建Dialog方法集合
+ * @returns Dialog方法对象
+ */
+export function createDialogMethods(): any
+
+/**
+ * 创建Dialog配置选项
+ * @param options - 选项
+ * @returns Dialog配置对象
+ */
+export function createDialogOptions(options?: any): any
+
+/**
+ * 在组件中使用通用Dialog的Hook
+ * @returns Dialog方法对象
+ */
+export function useCommonDialog(): {
+  commonDialogMethod: typeof commonDialogMethod
+}
+
+// ==================== 表格工具 ====================
+
+/**
+ * 创建二维码列
+ * @param config - 二维码配置
+ * @returns 表格列配置
+ */
+export function createQRCode(config?: {
+  /** 二维码数据字段 */
+  dataKey?: string
+  /** 列宽 */
+  width?: number
+  /** 二维码尺寸 */
+  size?: number
+}): TableColumn
+
+/**
+ * 使用二维码Hook
+ * @returns 二维码相关方法
+ */
+export function useQRCode(): {
+  /** 生成二维码 */
+  generateQRCode: (data: string, size?: number) => Promise<string>
+  /** 下载二维码 */
+  downloadQRCode: (data: string, filename?: string) => Promise<void>
+}
+
+// ==================== 插件和指令 ====================
+
+/**
+ * Vue插件对象
+ */
+export const CorePlugin: {
+  install(app: any, options?: any): void
+}
+
+/**
+ * 安装插件
+ * @param app - Vue应用实例
+ * @param options - 插件选项
+ */
+export function install(app: any, options?: any): void
+
+/**
+ * 权限指令
+ */
+export const permissionDirective: {
+  mounted(el: HTMLElement, binding: { value: string }): void
+  updated(el: HTMLElement, binding: { value: string }): void
+}
+
+/**
+ * 注册所有指令
+ * @param app - Vue应用实例
+ */
+export function registerDirectives(app: any): void
+
+/**
+ * 自动注册指令
+ * @param app - Vue应用实例
+ */
+export function autoRegisterDirectives(app: any): void
+
+/**
+ * 获取全局应用实例
+ * @returns Vue应用实例
+ */
+export function getGlobalApp(): any | null
 
 declare module 'core' {
   export * from './index.d'
