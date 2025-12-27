@@ -1,6 +1,6 @@
 {
   "name": "@xmszm/core",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "naiveui core 组件与工具库",
   "license": "UNLICENSED",
   "main": "./dist/index.cjs",
