@@ -136,6 +136,7 @@ export function commonDialogMethod(
     {
       label: '确定',
       valid: true,
+      loading:true,
       onClick: async ({ cancel, hideLoading }) =>
         interfaceFn
           ? await interfaceFn(unref(model), {
@@ -170,6 +171,10 @@ export function commonDialogMethod(
     return fn && fn()
   }
 
+    // 获取配置系统中的默认选项，优先使用配置系统的配置
+  const configDefaultOption = getDialogConfig()?.defaultOption || {}
+  const mergedDefaultOption = { ...dialogDefaultOption, ...configDefaultOption }
+
   const renderAction = !(read ?? isRead)
     ? typeof action === 'function'
       ? () => action({ formRef, data: unref(model), d: dialogRef.value, close: cancel })
@@ -189,7 +194,7 @@ export function commonDialogMethod(
                   )
                 : (
                     <NButton
-                      type="primary"
+                      type={mergedDefaultOption?.type ?? 'info'}
                       ghost={v.mode === 'cancel'}
                       {...(v?.props || {})}
                       {...(actionProps?.buttonProps || {})}
@@ -239,12 +244,9 @@ export function commonDialogMethod(
         )
     : null
 
-  // 获取配置系统中的默认选项，优先使用配置系统的配置
-  const configDefaultOption = getDialogConfig()?.defaultOption || {}
-  const mergedDefaultOption = { ...dialogDefaultOption, ...configDefaultOption }
+
 
   const d = dialogInstance.create({
-    type: 'info',
     ...mergedDefaultOption,
     ...(!noTitle
       ? { title: titleRender || (defaultModeEnum[mode]?.sub ?? '') + title }

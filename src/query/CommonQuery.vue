@@ -89,7 +89,7 @@ const _query = defineModel("query", {
 
 const defaultFormItemProps = {
   style: {
-    width: "33%",
+    width: "25%",
   },
 };
 const _queryOptionsKey = computed(() =>

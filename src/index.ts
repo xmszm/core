@@ -45,7 +45,7 @@ export { labelField as globalLabelField, valueField as globalValueField } from '
 
 export { initRules } from './dialog/utils/dialog'
 
-export { ellipsis } from './table/utils/ellipsis'
+export { ellipsis as globalEllipsis } from './table/utils/ellipsis'
 
 export { initRouteMeta } from './plugin/vite/initRouteMeta'
 

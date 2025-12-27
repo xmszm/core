@@ -291,7 +291,7 @@ export function initRouteMeta(routes: any[], base?: string): any[]
 /**
  * 表格单元格省略配置
  */
-export const ellipsis: {
+export const globalEllipsis: {
   tooltip: boolean
   lineClamp?: number
 }

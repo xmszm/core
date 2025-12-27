@@ -3,6 +3,7 @@ import { computed, unref } from 'vue'
 export const dialogDefaultOption = {
   showIcon: false,
   autoFocus: false,
+  type: 'info',
 }
 
 export function initRules({
