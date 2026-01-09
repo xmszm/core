@@ -42,7 +42,7 @@ const props = withDefaults(defineProps<DataTableProps>(), {
   emptyIcon: "",
   isFilter: false,
   isEllipsis: true,
-  virtual: () => ({}),
+  virtual: () => false,
   singleColumn: false,
 });
 const route = useRoute();
