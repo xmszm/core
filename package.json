@@ -5,7 +5,7 @@
   "license": "UNLICENSED",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
-  "types": "./types/index.d.ts",
+  "types": "./dist/index.d.ts",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
@@ -19,17 +19,17 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs",
       "style": "./dist/style.css",
-      "types": "./types/index.d.ts"
+      "types": "./dist/index.d.ts"
     },
     "./plugin/vite/initRouteMeta": {
       "import": "./dist/plugin/vite/initRouteMeta.mjs",
       "require": "./dist/plugin/vite/initRouteMeta.cjs",
-      "types": "./types/plugin/vite/initRouteMeta.d.ts"
+      "types": "./dist/plugin/vite/initRouteMeta.d.ts"
     },
     "./dist/style.css": {
       "import": "./dist/style.css",
       "require": "./dist/style.css",
-      "types": "./types/style.d.ts"
+      "types": "./dist/style.d.ts"
     },
     "./package.json": "./package.json"
   },
@@ -70,6 +70,7 @@
     "unocss": "^66.5.10",
     "unplugin-auto-import": "^20.3.0",
     "vite": "^5.4.0",
+    "vite-plugin-dts": "^4.5.4",
     "vitepress": "^1.2.3",
     "vue": "^3.3.0",
     "vue-router": "^4.2.0"

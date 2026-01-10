@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import AutoImport from 'unplugin-auto-import/vite'
 import UnoCSS from 'unocss/vite'
+import dts from 'vite-plugin-dts'
 import path from 'node:path'
 
 export default defineConfig({
@@ -16,6 +17,13 @@ export default defineConfig({
       include: /\.(tsx|jsx)$/,
     }),
     UnoCSS(),
+    dts({
+      include: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.vue'],
+      exclude: ['node_modules', 'dist', 'types', 'docs', 'examples'],
+      outDir: 'dist',
+      entryRoot: 'src',
+      rollupTypes: true,
+    }),
     AutoImport({
       imports: [
         'vue',
