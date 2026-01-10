@@ -171,9 +171,27 @@ core/
 ├── docs/             # VitePress 文档
 ├── examples/         # 示例代码
 ├── test-app/         # 测试应用
-├── types/            # TypeScript 类型定义
-└── dist/             # 构建输出
+├── types/            # TypeScript 模块声明
+├── dist/             # 构建输出（含自动生成的 .d.ts 文件）
+└── .claude/          # Claude Code 配置与规划文档
 ```
+
+## 📘 TypeScript 支持
+
+本库完全支持 TypeScript，并在构建时自动生成完整的类型定义文件（v0.0.9+）：
+
+```typescript
+import type { DataFormProps, DataTableProps, CommonDialogResult } from '@xmszm/core'
+import { DataForm, DataTable, commonDialogMethod } from '@xmszm/core'
+
+// 完整的类型提示和自动补全支持
+const formProps: DataFormProps = { /* ... */ }
+```
+
+**类型文件位置**：
+- 主库类型：`dist/index.d.ts`（自动生成）
+- 插件类型：`dist/plugin/vite/initRouteMeta.d.ts`（自动生成）
+- 模块声明：`types/*.d.ts`（模块补充）
 
 ## 📝 License
 

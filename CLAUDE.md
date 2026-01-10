@@ -111,7 +111,8 @@ src/
 The project is actively migrating from JavaScript to TypeScript:
 - Most `.js` files have been converted to `.ts`
 - JSX components are being converted to `.tsx`
-- Type definitions are in `types/` directory
+- Type definitions are **automatically generated** in `dist/` during build (v0.0.9+)
+- Legacy `types/` directory now contains only module declarations and enhancements
 - Some legacy `.js` files may still exist and should be converted when modified
 
 ### Key Dependencies
@@ -159,7 +160,11 @@ The project is actively migrating from JavaScript to TypeScript:
 
 ### Build System Notes
 - The build creates both ES and CommonJS outputs
-- Vite plugin has separate entry point for tree-shaking
+- **Vite plugin has separate entry point for tree-shaking**
+- **TypeScript type definitions are automatically generated to `dist/` directory** (using `vite-plugin-dts`)
+  - Main types: `dist/index.d.ts`
+  - Plugin types: `dist/plugin/vite/initRouteMeta.d.ts`
+  - No manual type maintenance needed in source code
 - External dependencies are not bundled
 - CSS is extracted to `dist/style.css`
 - UnoCSS provides utility-first styling with icon and attributify presets
